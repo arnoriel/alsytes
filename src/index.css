@@ -1,0 +1,333 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Force Light Mode Always ──────────────────────────────────── */
+:root {
+  color-scheme: light !important;
+}
+
+/* ─── CSS Custom Properties ────────────────────────────────────── */
+@layer base {
+  /* Light theme ONLY — always applied regardless of browser setting */
+  :root {
+    --bg:          #F8F7FF;
+    --bg-50:       #FDFCFF;
+    --surface:     #FFFFFF;
+    --surface-alt: #F3F2FA;
+    --border:      #E2DFEF;
+    --border-soft: #EBE9F5;
+
+    --text-primary:   #14121F;
+    --text-secondary: #4A4660;
+    --text-muted:     #9A96B0;
+
+    --accent:       #7C3AED;
+    --accent-dim:   #6D28D9;
+    --accent-glow:  rgba(124,58,237,0.22);
+    --accent-muted: rgba(124,58,237,0.08);
+    --accent-soft:  rgba(124,58,237,0.15);
+
+    --orange:       #F97316;
+    --orange-soft:  rgba(249,115,22,0.10);
+
+    --red:          #EF4444;
+    --red-soft:     rgba(239,68,68,0.10);
+
+    --green:        #10B981;
+    --green-soft:   rgba(16,185,129,0.10);
+
+    --shadow-sm:    0 1px 3px rgba(60,40,120,0.07), 0 2px 6px rgba(60,40,120,0.04);
+    --shadow-md:    0 4px 16px rgba(60,40,120,0.09), 0 1px 3px rgba(60,40,120,0.05);
+    --shadow-lg:    0 8px 32px rgba(60,40,120,0.12), 0 2px 8px rgba(60,40,120,0.06);
+  }
+
+  * { box-sizing: border-box; }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light !important;
+  }
+
+  body {
+    background-color: var(--bg) !important;
+    color: var(--text-primary) !important;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Force override any OS/browser dark mode preferences */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:          #F8F7FF !important;
+      --bg-50:       #FDFCFF !important;
+      --surface:     #FFFFFF !important;
+      --surface-alt: #F3F2FA !important;
+      --border:      #E2DFEF !important;
+      --border-soft: #EBE9F5 !important;
+      --text-primary:   #14121F !important;
+      --text-secondary: #4A4660 !important;
+      --text-muted:     #9A96B0 !important;
+      --accent:       #7C3AED !important;
+      --accent-dim:   #6D28D9 !important;
+      --accent-glow:  rgba(124,58,237,0.22) !important;
+      --accent-muted: rgba(124,58,237,0.08) !important;
+      --accent-soft:  rgba(124,58,237,0.15) !important;
+    }
+    body {
+      background-color: #F8F7FF !important;
+      color: #14121F !important;
+    }
+  }
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar         { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track   { background: transparent; }
+  ::-webkit-scrollbar-thumb   { background: var(--border); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+  /* ── Selection ── */
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--text-primary);
+  }
+}
+
+/* ─── Component Layer ───────────────────────────────────────────── */
+@layer components {
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+  }
+  .card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--accent-soft);
+    transform: translateY(-2px);
+  }
+
+  .glass {
+    backdrop-filter: blur(20px) saturate(1.5);
+    -webkit-backdrop-filter: blur(20px) saturate(1.5);
+    background: rgba(255,255,255,0.88);
+    border: 1px solid rgba(226,223,239,0.80);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border-radius: 10px;
+    padding: 0.5rem 1.125rem;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: none;
+    border: none;
+    outline: none;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 2px 8px var(--accent-glow);
+  }
+  .btn-primary:hover {
+    background: var(--accent-dim);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 18px var(--accent-glow);
+  }
+
+  .btn-secondary {
+    background: var(--surface-alt);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem;
+    padding: 0.625rem 1rem;
+    width: 100%;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    outline: none;
+  }
+  .input::placeholder { color: var(--text-muted); }
+  .input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-muted);
+  }
+
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.15s ease;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .sidebar-item:hover {
+    background: var(--surface-alt);
+    color: var(--text-primary);
+  }
+  .sidebar-item.active {
+    background: var(--accent-muted);
+    color: var(--accent);
+  }
+
+  .text-gradient-alsytes {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-image: linear-gradient(135deg, #7C3AED 0%, #F97316 50%, #EF4444 100%);
+  }
+
+  .dot-grid {
+    background-image: radial-gradient(circle, var(--border) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  .code-block {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    padding: 1rem;
+    color: var(--text-primary);
+    overflow-x: auto;
+  }
+}
+
+/* ─── Utilities ─────────────────────────────────────────────────── */
+@layer utilities {
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      var(--surface-alt) 0%,
+      var(--surface) 50%,
+      var(--surface-alt) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.6s ease-in-out infinite;
+  }
+
+  .fade-in-up  { animation: fadeInUp 0.35s ease forwards; }
+  .scale-in    { animation: scaleIn 0.25s ease forwards; }
+  .cursor-blink { animation: cursorBlink 0.8s ease-in-out infinite; }
+}
+
+/* ─── Keyframes ─────────────────────────────────────────────────── */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes meshMove {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+  33%  { transform: translate(30px, -20px) rotate(120deg) scale(1.05); }
+  66%  { transform: translate(-20px, 30px) rotate(240deg) scale(0.95); }
+  100% { transform: translate(0, 0) rotate(360deg) scale(1); }
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25%  { transform: translate(40px, -60px) scale(1.08); }
+  50%  { transform: translate(-30px, -40px) scale(0.94); }
+  75%  { transform: translate(50px, 30px) scale(1.04); }
+}
+
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25%  { transform: translate(-50px, 40px) scale(0.92); }
+  50%  { transform: translate(30px, 60px) scale(1.06); }
+  75%  { transform: translate(-40px, -30px) scale(1.02); }
+}
+
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(60px, 30px) scale(1.1); }
+  66%  { transform: translate(-40px, -50px) scale(0.90); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(124,58,237,0.15); }
+  50%       { box-shadow: 0 0 40px rgba(124,58,237,0.35); }
+}
+
+.animate-gradient-shift {
+  background-size: 300% 300%;
+  animation: gradientShift 8s ease infinite;
+}
+
+.animate-orb-1 { animation: orbFloat1 12s ease-in-out infinite; }
+.animate-orb-2 { animation: orbFloat2 15s ease-in-out infinite; }
+.animate-orb-3 { animation: orbFloat3 10s ease-in-out infinite; }
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-mesh  { animation: meshMove 20s ease-in-out infinite; }
+
+/* ─── Backwards Compat CSS Variables ──────────────────────── */
+/* For PreviewPage.tsx and view.tsx that use old var names     */
+:root {
+  --bg-base:        #F8F7FF;
+  --surface-color:  #FFFFFF;
+  --border-color:   #E2DFEF;
+  --text-code:      #374151;
+  --accent-color:   #7C3AED;
+  --green-accent:   #10B981;
+}
+
+/* Tailwind utility classes for old dot-pattern */
+.bg-dot-pattern {
+  background-image: radial-gradient(circle, rgba(124,58,237,0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
