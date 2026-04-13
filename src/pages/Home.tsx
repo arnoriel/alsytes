@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Globe, Menu, Wand2, Gamepad2, LayoutDashboard, Wrench,
   Sparkles, MessageSquare, ClipboardList, ArrowRight, ArrowLeft,
-  Check, ChevronRight
+  Check, ChevronRight,
 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import PromptInput from '../components/PromptInput';
@@ -44,7 +44,6 @@ const CATEGORY_OPTIONS: { value: WebsiteCategory; label: string; icon: React.Ele
   { value: 'other', label: 'Other', icon: Wand2, desc: 'Something unique', color: 'text-slate-600 bg-slate-50 border-slate-200' },
 ];
 
-// Dynamic form steps per category
 const FORM_STEPS: Record<WebsiteCategory, { key: string; question: string; placeholder: string; type: 'text' | 'select'; options?: string[] }[]> = {
   'landing-page': [
     { key: 'brand', question: 'What is your brand/company name?', placeholder: 'e.g. AcmeCorp, Startup X...', type: 'text' },
@@ -91,12 +90,12 @@ const FORM_STEPS: Record<WebsiteCategory, { key: string; question: string; place
   'blog': [
     { key: 'blogName', question: 'What is your blog name?', placeholder: 'e.g. Tech Bites, The Wandering Chef...', type: 'text' },
     { key: 'niche', question: 'What topic do you write about?', placeholder: 'e.g. Web development tutorials, travel stories, Indonesian recipes...', type: 'text' },
-    { key: 'author', question: 'What is the author\'s name and bio?', placeholder: 'e.g. Budi Santoso, a senior dev with 10 years experience...', type: 'text' },
+    { key: 'author', question: "What is the author's name and bio?", placeholder: 'e.g. Budi Santoso, a senior dev with 10 years experience...', type: 'text' },
     { key: 'posts', question: 'Describe 3 sample blog posts', placeholder: 'e.g. "Getting started with React", "Best React hooks 2025", "React vs Vue"...', type: 'text' },
     { key: 'style', question: 'What aesthetic do you want?', placeholder: 'e.g. Editorial magazine, minimal code blog, warm personal journal...', type: 'text' },
   ],
   'other': [
-    { key: 'description', question: 'Describe what you want to build', placeholder: 'Tell me everything — what it does, who it\'s for, and what it looks like...', type: 'text' },
+    { key: 'description', question: 'Describe what you want to build', placeholder: "Tell me everything — what it does, who it's for, and what it looks like...", type: 'text' },
     { key: 'features', question: 'What are the key features?', placeholder: 'List the most important functionality...', type: 'text' },
     { key: 'style', question: 'What visual style do you want?', placeholder: 'e.g. Dark and minimal, vibrant and playful, luxury and elegant...', type: 'text' },
   ],
@@ -105,20 +104,27 @@ const FORM_STEPS: Record<WebsiteCategory, { key: string; question: string; place
 function buildPromptFromForm(formData: FormData, category: WebsiteCategory): string {
   const steps = FORM_STEPS[category];
   const parts: string[] = [];
-
   const catLabel = CATEGORY_OPTIONS.find((c) => c.value === category)?.label ?? category;
   parts.push(`Build a complete, fully functional ${catLabel} with these specifications:`);
-
   for (const step of steps) {
     const val = formData[step.key];
     if (val?.trim()) {
       parts.push(`- ${step.question.replace('?', '')}: ${val.trim()}`);
     }
   }
-
   parts.push('Make it visually stunning, fully responsive, and production-ready.');
   return parts.join('\n');
 }
+
+// ── Idea cards for Free Prompt mode ──────────────────────────────
+const IDEA_CARDS = [
+  { emoji: '🚀', label: 'SaaS Landing Page', prompt: 'Landing page untuk startup SaaS dengan dark theme elegan, hero section dengan animasi, pricing table, dan testimonials', color: 'rgba(124,58,237,0.06)', border: 'rgba(124,58,237,0.15)', accent: '#7C3AED' },
+  { emoji: '🎮', label: 'Arcade Game', prompt: 'Buat game Snake classic versi modern — dark neon aesthetic, high score tersimpan, level progression, dan animasi smooth', color: 'rgba(249,115,22,0.06)', border: 'rgba(249,115,22,0.18)', accent: '#F97316' },
+  { emoji: '📊', label: 'SaaS Dashboard', prompt: 'Dashboard CRM untuk freelancer — manage clients, projects, invoice tracker, stats cards, dan data table yang interaktif', color: 'rgba(16,185,129,0.06)', border: 'rgba(16,185,129,0.18)', accent: '#10B981' },
+  { emoji: '🎨', label: 'Portfolio', prompt: 'Portfolio fotografer profesional dengan aesthetic film noir hitam putih, galeri masonry, smooth hover effects, dan contact form', color: 'rgba(59,130,246,0.06)', border: 'rgba(59,130,246,0.18)', accent: '#3B82F6' },
+  { emoji: '🛠️', label: 'Utility Tool', prompt: 'Kalkulator BMI + kalori harian — input berat/tinggi/usia, hasil instant dengan chart, dan history 10 terakhir tersimpan', color: 'rgba(245,158,11,0.06)', border: 'rgba(245,158,11,0.18)', accent: '#F59E0B' },
+  { emoji: '🛒', label: 'E-commerce', prompt: 'Toko online boutique fashion lokal — product grid dengan filter kategori, detail produk, keranjang belanja, dan checkout flow', color: 'rgba(236,72,153,0.06)', border: 'rgba(236,72,153,0.18)', accent: '#EC4899' },
+];
 
 // ── Component ─────────────────────────────────────────────────────
 export default function Home() {
@@ -136,6 +142,7 @@ export default function Home() {
   const [summaryMessage, setSummaryMessage] = useState('');
   const [summaryStatus, setSummaryStatus] = useState<SummaryStatus>('idle');
   const [mode, setMode] = useState<HomeMode>('select');
+  const [suggestedPrompt, setSuggestedPrompt] = useState('');
 
   // Form wizard state
   const [formData, setFormData] = useState<FormData>({ category: '' });
@@ -239,6 +246,11 @@ export default function Home() {
     setMode('select');
     setFormData({ category: '' });
     setFormStep(0);
+    setSuggestedPrompt('');
+  };
+
+  const handleIdeaCard = (prompt: string) => {
+    setSuggestedPrompt(prompt);
   };
 
   const selectedCategory = formData.category as WebsiteCategory;
@@ -253,6 +265,11 @@ export default function Home() {
     { icon: LayoutDashboard, label: 'SaaS / Apps', desc: 'Dashboard, CRM, todo, kanban', color: 'text-blue-600 bg-blue-50 border-blue-100' },
     { icon: Wrench, label: 'Tools', desc: 'Calculator, converter, generator', color: 'text-amber-600 bg-amber-50 border-amber-100' },
   ];
+
+  // Whether we're in the idle free-prompt centered view
+  const isPromptIdle = mode === 'prompt' && status === 'idle';
+  // Whether AI is actively working
+  const isGenerating = status !== 'idle';
 
   return (
     <div className="flex h-screen overflow-hidden" style={{ background: '#F8F7FF', fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
@@ -314,6 +331,7 @@ export default function Home() {
         {/* Main body */}
         <main className="flex-1 overflow-y-auto">
           <AnimatePresence mode="wait">
+
             {/* ── Mode Select ── */}
             {mode === 'select' && status === 'idle' && (
               <motion.div
@@ -352,7 +370,6 @@ export default function Home() {
 
                   {/* Two options */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
-                    {/* Prompt input */}
                     <motion.button
                       whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
@@ -370,15 +387,11 @@ export default function Home() {
                       <p className="text-sm leading-relaxed" style={{ color: '#9A96B0' }}>
                         Describe your website in your own words. Fast and flexible.
                       </p>
-                      <div
-                        className="mt-4 flex items-center gap-1.5 text-xs font-semibold"
-                        style={{ color: '#7C3AED' }}
-                      >
+                      <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold" style={{ color: '#7C3AED' }}>
                         Start typing <ArrowRight size={12} />
                       </div>
                     </motion.button>
 
-                    {/* Form wizard */}
                     <motion.button
                       whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
@@ -396,10 +409,7 @@ export default function Home() {
                       <p className="text-sm leading-relaxed" style={{ color: '#9A96B0' }}>
                         Answer a few questions and we'll craft the perfect prompt for you.
                       </p>
-                      <div
-                        className="mt-4 flex items-center gap-1.5 text-xs font-semibold"
-                        style={{ color: '#F97316' }}
-                      >
+                      <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold" style={{ color: '#F97316' }}>
                         Get guided <ArrowRight size={12} />
                       </div>
                     </motion.button>
@@ -442,7 +452,6 @@ export default function Home() {
                 className="flex flex-col items-center min-h-full px-4 md:px-6 py-8"
               >
                 <div className="max-w-xl w-full">
-                  {/* Back */}
                   <button
                     onClick={() => {
                       if (formStep > 0) { setFormStep((s) => s - 1); }
@@ -455,14 +464,12 @@ export default function Home() {
                     <ArrowLeft size={15} /> Back
                   </button>
 
-                  {/* Step: choose category */}
                   {!formData.category ? (
                     <div>
                       <h2 className="text-2xl mb-1" style={{ fontWeight: 800, color: '#14121F' }}>
                         What do you want to build?
                       </h2>
                       <p className="text-sm mb-6" style={{ color: '#9A96B0' }}>Choose the type of website</p>
-
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {CATEGORY_OPTIONS.map((cat) => {
                           const Icon = cat.icon;
@@ -471,10 +478,7 @@ export default function Home() {
                               key={cat.value}
                               whileHover={{ scale: 1.03, y: -2 }}
                               whileTap={{ scale: 0.97 }}
-                              onClick={() => {
-                                setFormData({ category: cat.value });
-                                setFormStep(0);
-                              }}
+                              onClick={() => { setFormData({ category: cat.value }); setFormStep(0); }}
                               className="p-4 rounded-2xl border text-left transition-all"
                               style={{ background: '#fff', borderColor: '#E2DFEF' }}
                             >
@@ -540,9 +544,7 @@ export default function Home() {
                       />
 
                       <div className="flex items-center justify-between mt-4">
-                        <span className="text-xs" style={{ color: '#9A96B0' }}>
-                          Tip: Ctrl+Enter to continue
-                        </span>
+                        <span className="text-xs" style={{ color: '#9A96B0' }}>Tip: Ctrl+Enter to continue</span>
                         {formStep < totalSteps - 1 ? (
                           <motion.button
                             whileHover={{ scale: 1.03 }}
@@ -568,7 +570,6 @@ export default function Home() {
                         )}
                       </div>
 
-                      {/* Previous answers summary */}
                       {formStep > 0 && (
                         <div className="mt-6 flex flex-col gap-2">
                           <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#9A96B0' }}>Your answers so far</p>
@@ -595,75 +596,118 @@ export default function Home() {
               </motion.div>
             )}
 
-            {/* ── Prompt mode + Generation panel ── */}
-            {(mode === 'prompt' || status !== 'idle') && (
+            {/* ── Free Prompt Centered (idle) ── */}
+            {isPromptIdle && (
               <motion.div
-                key="prompt"
+                key="prompt-idle"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -16 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col items-center justify-center min-h-full px-4 md:px-6 py-10"
+              >
+                <div className="max-w-2xl w-full flex flex-col gap-6">
+                  {/* Heading */}
+                  <div className="text-center">
+                    <div
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4"
+                      style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.18)', color: '#7C3AED' }}
+                    >
+                      <Sparkles size={11} />
+                      Free Prompt
+                    </div>
+                    <h2 className="text-2xl md:text-3xl leading-tight" style={{ fontWeight: 800, color: '#14121F' }}>
+                      Describe your{' '}
+                      <em
+                        className="not-italic"
+                        style={{
+                          background: 'linear-gradient(135deg, #7C3AED, #F97316)',
+                          backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+                        }}
+                      >
+                        website
+                      </em>
+                    </h2>
+                    <p className="text-sm mt-2" style={{ color: '#9A96B0' }}>
+                      Type anything — or pick an idea below to get started fast.
+                    </p>
+                  </div>
+
+                  {/* Centered PromptInput */}
+                  <PromptInput
+                    onSubmit={handleGenerate}
+                    status={status}
+                    suggestedPrompt={suggestedPrompt}
+                    onSuggestedPromptConsumed={() => setSuggestedPrompt('')}
+                  />
+
+                  {/* Idea cards */}
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{ color: '#9A96B0' }}>
+                      ✦ Prompt Ideas
+                    </p>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5">
+                      {IDEA_CARDS.map((card) => (
+                        <motion.button
+                          key={card.label}
+                          whileHover={{ scale: 1.02, y: -1 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleIdeaCard(card.prompt)}
+                          className="p-3.5 rounded-xl border text-left transition-all"
+                          style={{
+                            background: card.color,
+                            borderColor: card.border,
+                          }}
+                        >
+                          <span className="text-lg leading-none block mb-1.5">{card.emoji}</span>
+                          <p className="text-xs font-semibold" style={{ color: '#14121F' }}>{card.label}</p>
+                          <p className="text-[10px] mt-0.5 leading-snug line-clamp-2" style={{ color: '#9A96B0' }}>
+                            {card.prompt.slice(0, 60)}…
+                          </p>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Back link */}
+                  <button
+                    onClick={() => setMode('select')}
+                    className="flex items-center gap-1.5 text-xs font-medium mx-auto hover:opacity-70 transition-opacity"
+                    style={{ color: '#9A96B0' }}
+                  >
+                    <ArrowLeft size={12} /> Back to options
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ── Generation Panel (active) ── */}
+            {isGenerating && (
+              <motion.div
+                key="generating"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="max-w-4xl mx-auto px-4 md:px-6 py-5 md:py-6 flex flex-col gap-4"
               >
-                {/* Recent sites grid (idle, prompt mode) */}
-                {websites.length > 0 && status === 'idle' && (
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"
-                  >
-                    {websites.slice(0, 6).map((site, i) => (
-                      <motion.div
-                        key={site.id}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.06 }}
-                        className="group p-4 rounded-2xl border cursor-pointer transition-all hover:-translate-y-0.5"
-                        style={{ background: '#fff', borderColor: '#E2DFEF', boxShadow: '0 2px 8px rgba(60,40,120,0.05)' }}
-                        onClick={() => handlePreview(site.id)}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div
-                            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                            style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.18)' }}
-                          >
-                            <Globe size={14} style={{ color: '#7C3AED' }} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold truncate" style={{ color: '#14121F' }}>{site.name}</p>
-                            <p className="text-xs mt-0.5 line-clamp-2 leading-snug" style={{ color: '#9A96B0' }}>{site.prompt}</p>
-                          </div>
-                        </div>
-                        <div className="mt-3 flex items-center gap-2 text-xs" style={{ color: '#9A96B0' }}>
-                          <span className="px-2 py-0.5 rounded-full font-mono" style={{ background: '#F8F7FF', border: '1px solid #E2DFEF', color: '#4A4660' }}>
-                            {site.source_code.length.toLocaleString()} chars
-                          </span>
-                          <span className="font-medium" style={{ color: '#7C3AED' }}>→ Preview</span>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </motion.div>
-                )}
-
-                {/* Generation Panel */}
-                {status !== 'idle' && (
-                  <GenerationPanel
-                    status={status}
-                    streamedCode={streamedCode}
-                    currentWebsite={currentWebsite}
-                    onPreview={handlePreview}
-                    errorMessage={errorMessage}
-                    summaryMessage={summaryMessage}
-                    summaryStatus={summaryStatus}
-                    userName={userName}
-                  />
-                )}
+                <GenerationPanel
+                  status={status}
+                  streamedCode={streamedCode}
+                  currentWebsite={currentWebsite}
+                  onPreview={handlePreview}
+                  errorMessage={errorMessage}
+                  summaryMessage={summaryMessage}
+                  summaryStatus={summaryStatus}
+                  userName={userName}
+                />
               </motion.div>
             )}
+
           </AnimatePresence>
         </main>
 
-        {/* Bottom input — only show in prompt mode or when idle on select */}
-        {mode === 'prompt' && (
+        {/* Bottom input — only shown while AI is generating/done so user can re-prompt */}
+        {isGenerating && (
           <div
             className="flex-shrink-0 px-3 md:px-6 py-3 md:py-4"
             style={{

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Globe, Trash2, Eye, PanelLeftClose, PanelLeft, X, Layers,
+  Globe, Trash2, Eye, PanelLeftClose, PanelLeft, X, Layers, AlertTriangle,
 } from 'lucide-react';
 import type { Website } from '../types';
 import { storage } from '../lib/storage';
@@ -18,36 +18,130 @@ interface SidebarProps {
   onMobileClose?: () => void;
 }
 
-export default function Sidebar({
-  websites, activeId, onSelect, onPreview, onDelete,
-  mobileOpen = false, onMobileClose,
-}: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
-  const [hoverId, setHoverId] = useState<string | null>(null);
-  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+interface SidebarContentProps {
+  websites: Website[];
+  activeId?: string;
+  hoverId: string | null;
+  setHoverId: (id: string | null) => void;
+  onRequestDelete: (site: Website) => void;
+  collapsed: boolean;
+  setCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  onSelect: (id: string) => void;
+  onPreview: (id: string) => void;
+  onMobileClose?: () => void;
+  isMobile?: boolean;
+}
 
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
+// ── Delete Confirmation Modal ─────────────────────────────────────
+function DeleteModal({
+  site,
+  onConfirm,
+  onCancel,
+}: {
+  site: Website;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <AnimatePresence>
+      <motion.div
+        key="modal-backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center px-4"
+        style={{ background: 'rgba(20,18,31,0.45)', backdropFilter: 'blur(4px)' }}
+        onClick={onCancel}
+      >
+        <motion.div
+          key="modal-card"
+          initial={{ opacity: 0, scale: 0.95, y: 8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: 8 }}
+          transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
+          onClick={(e) => e.stopPropagation()}
+          className="w-full max-w-sm rounded-2xl p-6"
+          style={{
+            background: '#fff',
+            border: '1px solid #E2DFEF',
+            boxShadow: '0 24px 48px rgba(20,18,31,0.18)',
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+          }}
+        >
+          {/* Icon */}
+          <div
+            className="w-11 h-11 rounded-full flex items-center justify-center mb-4"
+            style={{ background: '#FEF2F2', border: '1px solid rgba(239,68,68,0.20)' }}
+          >
+            <AlertTriangle size={18} style={{ color: '#EF4444' }} />
+          </div>
 
-  const handleDelete = async (id: string) => {
-    if (confirmDelete === id) {
-      await storage.delete(id);
-      onDelete(id);
-      setConfirmDelete(null);
-    } else {
-      setConfirmDelete(id);
-      setTimeout(() => setConfirmDelete(null), 2500);
-    }
-  };
+          {/* Heading */}
+          <h3 className="text-base mb-1.5" style={{ fontWeight: 700, color: '#14121F' }}>
+            Delete website?
+          </h3>
+          <p className="text-sm mb-3" style={{ color: '#9A96B0', lineHeight: 1.6 }}>
+            You're about to permanently delete:
+          </p>
 
+          {/* Site name pill */}
+          <div
+            className="flex items-center gap-2 px-3 py-2.5 rounded-xl mb-4"
+            style={{ background: '#F8F7FF', border: '1px solid #E2DFEF' }}
+          >
+            <Globe size={13} style={{ color: '#7C3AED', flexShrink: 0 }} />
+            <span className="text-sm font-semibold truncate" style={{ color: '#14121F' }}>
+              {site.name}
+            </span>
+          </div>
+
+          <p className="text-xs mb-5" style={{ color: '#C4B5FD' }}>
+            This action cannot be undone.
+          </p>
+
+          {/* Actions */}
+          <div className="flex gap-2.5">
+            <button
+              onClick={onCancel}
+              className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-80"
+              style={{
+                background: '#F8F7FF',
+                border: '1px solid #E2DFEF',
+                color: '#4A4660',
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={onConfirm}
+              className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90"
+              style={{
+                background: '#FEF2F2',
+                border: '1px solid rgba(239,68,68,0.25)',
+                color: '#EF4444',
+              }}
+            >
+              Delete
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+// ── Sidebar Content (module-level, stable reference) ──────────────
+function SidebarContent({
+  websites, activeId, hoverId, setHoverId, onRequestDelete,
+  collapsed, setCollapsed, onSelect, onPreview, onMobileClose,
+  isMobile = false,
+}: SidebarContentProps) {
   const formatDate = (iso: string) => {
     const d = new Date(iso);
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const SidebarContent = ({ isMobile = false }: { isMobile?: boolean }) => (
+  return (
     <div className="flex flex-col h-full" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
       {/* Header */}
       <div
@@ -178,14 +272,10 @@ export default function Sidebar({
                       <Eye size={11} />
                     </button>
                     <button
-                      onClick={(e) => { e.stopPropagation(); handleDelete(site.id); }}
+                      onClick={(e) => { e.stopPropagation(); onRequestDelete(site); }}
                       className="p-1.5 rounded-lg transition-colors"
-                      style={
-                        confirmDelete === site.id
-                          ? { background: '#FEF2F2', border: '1px solid rgba(239,68,68,0.25)', color: '#EF4444' }
-                          : { background: '#fff', border: '1px solid #E2DFEF', color: '#9A96B0' }
-                      }
-                      title={confirmDelete === site.id ? 'Confirm delete' : 'Delete'}
+                      style={{ background: '#fff', border: '1px solid #E2DFEF', color: '#9A96B0' }}
+                      title="Delete"
                     >
                       <Trash2 size={11} />
                     </button>
@@ -203,6 +293,41 @@ export default function Sidebar({
       </div>
     </div>
   );
+}
+
+// ── Main Sidebar export ───────────────────────────────────────────
+export default function Sidebar({
+  websites, activeId, onSelect, onPreview, onDelete,
+  mobileOpen = false, onMobileClose,
+}: SidebarProps) {
+  const [collapsed, setCollapsed] = useState(false);
+  const [hoverId, setHoverId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Website | null>(null);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileOpen]);
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    await storage.delete(deleteTarget.id);
+    onDelete(deleteTarget.id);
+    setDeleteTarget(null);
+  };
+
+  const sharedProps: SidebarContentProps = {
+    websites,
+    activeId,
+    hoverId,
+    setHoverId,
+    onRequestDelete: (site) => setDeleteTarget(site),
+    collapsed,
+    setCollapsed,
+    onSelect,
+    onPreview,
+    onMobileClose,
+  };
 
   return (
     <>
@@ -213,7 +338,7 @@ export default function Sidebar({
         className="hidden md:flex flex-col flex-shrink-0 h-full border-r overflow-hidden"
         style={{ background: '#fff', borderColor: '#E2DFEF' }}
       >
-        <SidebarContent />
+        <SidebarContent {...sharedProps} />
       </motion.aside>
 
       {/* Mobile overlay */}
@@ -236,11 +361,20 @@ export default function Sidebar({
               className="md:hidden fixed top-0 left-0 bottom-0 w-64 z-50 border-r"
               style={{ background: '#fff', borderColor: '#E2DFEF' }}
             >
-              <SidebarContent isMobile />
+              <SidebarContent {...sharedProps} isMobile />
             </motion.aside>
           </>
         )}
       </AnimatePresence>
+
+      {/* Delete confirmation modal */}
+      {deleteTarget && (
+        <DeleteModal
+          site={deleteTarget}
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setDeleteTarget(null)}
+        />
+      )}
     </>
   );
 }

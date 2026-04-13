@@ -21,9 +21,11 @@ const PROMPT_SUGGESTIONS = [
 interface PromptInputProps {
   onSubmit: (prompt: string, apiKey: string) => void;
   status: GenerationStatus;
+  suggestedPrompt?: string;
+  onSuggestedPromptConsumed?: () => void;
 }
 
-export default function PromptInput({ onSubmit, status }: PromptInputProps) {
+export default function PromptInput({ onSubmit, status, suggestedPrompt, onSuggestedPromptConsumed }: PromptInputProps) {
   const [prompt, setPrompt] = useState('');
   const [apiKey, setApiKey] = useState(
     () => ENV.apiKey ?? localStorage.getItem('alsytes_api_key') ?? ''
@@ -36,6 +38,22 @@ export default function PromptInput({ onSubmit, status }: PromptInputProps) {
   useEffect(() => {
     if (apiKey) localStorage.setItem('alsytes_api_key', apiKey);
   }, [apiKey]);
+
+  // When a suggestion is passed from parent (idea cards), fill the prompt
+  useEffect(() => {
+    if (suggestedPrompt) {
+      setPrompt(suggestedPrompt);
+      onSuggestedPromptConsumed?.();
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.focus();
+          const el = textareaRef.current;
+          el.style.height = "auto";
+          el.style.height = Math.min(el.scrollHeight, 200) + "px";
+        }
+      }, 50);
+    }
+  }, [suggestedPrompt]);
 
   const autoResize = () => {
     const el = textareaRef.current;

@@ -389,7 +389,7 @@ export default function PreviewPage() {
           >
             {/* Back */}
             <button
-              onClick={() => navigate('/')}
+              onClick={() => navigate('/home')}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-base-100 hover:bg-base-200 text-text-muted hover:text-text-primary text-xs font-medium transition-colors flex-shrink-0"
             >
               <ArrowLeft size={12} />
