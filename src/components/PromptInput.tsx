@@ -28,15 +28,15 @@ interface PromptInputProps {
 export default function PromptInput({ onSubmit, status, suggestedPrompt, onSuggestedPromptConsumed }: PromptInputProps) {
   const [prompt, setPrompt] = useState('');
   const [apiKey, setApiKey] = useState(
-    () => ENV.apiKey ?? localStorage.getItem('alsytes_api_key') ?? ''
+    () => ENV.apiKey ?? localStorage.getItem('alsytes_gemma_key') ?? ''
   );
-  const [showApiInput] = useState(!ENV.hasEnvKey && !localStorage.getItem('alsytes_api_key'));
+  const [showApiInput] = useState(!ENV.hasEnvKey && !localStorage.getItem('alsytes_gemma_key'));
   const [showSuggestions, setShowSuggestions] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isGenerating = status === 'thinking' || status === 'streaming';
 
   useEffect(() => {
-    if (apiKey) localStorage.setItem('alsytes_api_key', apiKey);
+    if (apiKey) localStorage.setItem('alsytes_gemma_key', apiKey);
   }, [apiKey]);
 
   // When a suggestion is passed from parent (idea cards), fill the prompt

@@ -1,6 +1,5 @@
 import { ENV } from './env';
 
-const OPENROUTER_BASE = 'https://openrouter.ai/api/v1';
 
 export const SYSTEM_PROMPT = `You are Alsytes — a world-class creative director, senior full-stack frontend engineer, and interactive experience designer. You can build ANY type of website or web application from a single description.
 
@@ -175,6 +174,38 @@ USER CUSTOMIZATION OVERRIDE RULES
 - Defaults only fill gaps — never override explicit user constraints
 
 ═══════════════════════════════════════
+DENSITY & RICHNESS MANDATE
+═══════════════════════════════════════
+You have a large output budget. USE IT FULLY. Never stop early.
+
+VOLUME EXPECTATIONS:
+- Landing Pages: minimum 800 lines of HTML. Fill every section with real, rich content.
+- SaaS/Apps: minimum 900 lines. Every view, modal, and state fully coded.
+- Games: minimum 700 lines. Full game loop, particles, sound, multiple screens.
+- Tools: minimum 500 lines. Full logic, history, keyboard shortcuts, animations.
+
+HOW TO USE THE BUDGET:
+- Write MORE CSS — custom animations, keyframes, hover states, transitions for every interactive element
+- Write MORE JS — helper functions, utilities, edge case handlers, smooth state management
+- Write MORE HTML — richer section content, more detailed cards, more copy, more visual elements
+- Add micro-interactions on EVERY clickable/hoverable element
+- Every section gets a unique visual treatment — no two sections look the same
+- Animations: at least 8 distinct animation types across the page
+- For landing pages: add a Testimonials section with 3 detailed quotes AND a detailed FAQ section
+- For SaaS: add at least 4 fully functional views/pages with real data flows
+- For games: add particle systems, screen shake, combo multipliers, high score animations
+
+DESIGN RICHNESS RULES:
+- Custom CSS properties (--variables) for every design token
+- Glassmorphism, neumorphism, or gradient mesh on at least one hero element
+- SVG illustrations or icons inline — never use emoji as the only visual
+- At least 3 custom @keyframe animations defined
+- Parallax or depth effects on hero sections
+- Gradient text on headlines (background-clip: text)
+- Custom scrollbar styling
+- Hover states that feel premium: scale + shadow + color shift together
+
+═══════════════════════════════════════
 QUALITY BAR
 ═══════════════════════════════════════
 Every output must be:
@@ -195,6 +226,9 @@ export interface StreamCallbacks {
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
+// Google AI Studio native endpoint — Gemma 4 uses generateContent, NOT /chat/completions
+const GEMMA_BASE = 'https://generativelanguage.googleapis.com/v1beta';
+
 const MAX_CONTINUATIONS = 1;
 
 function isHtmlComplete(html: string): boolean {
@@ -210,27 +244,77 @@ function stripFences(text: string): string {
   return t;
 }
 
+// Convert OpenAI-style messages → Gemini/Gemma native payload format
+function toGemmaPayload(
+  messages: Array<{ role: string; content: string }>,
+  temperature: number,
+  maxOutputTokens: number
+) {
+  const systemMsg = messages.find((m) => m.role === 'system');
+  const chatMsgs = messages.filter((m) => m.role !== 'system');
+
+  const contents = chatMsgs.map((m) => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }],
+  }));
+
+  return {
+    ...(systemMsg
+      ? { system_instruction: { parts: [{ text: systemMsg.content }] } }
+      : {}),
+    contents,
+    generationConfig: {
+      temperature,
+      maxOutputTokens,
+    },
+  };
+}
+
+// Extract text delta from a Gemma/Gemini SSE chunk.
+// Gemma 4 thinking mode produces two part types:
+//   - thought parts: { "thought": true, "text": "..." }  ← skip these
+//   - output parts:  { "text": "..." }                   ← keep these
+// By filtering out thought=true parts, thinking runs internally
+// but never leaks into the streamed output.
+function extractGemmaDelta(jsonStr: string): string {
+  try {
+    const json = JSON.parse(jsonStr);
+    const parts = json?.candidates?.[0]?.content?.parts;
+    if (!Array.isArray(parts)) return '';
+    return parts
+      .filter((p: { thought?: boolean }) => !p.thought)
+      .map((p: { text?: string }) => p.text ?? '')
+      .join('');
+  } catch {
+    return '';
+  }
+}
+
+// Safety net: strip any preamble before <!DOCTYPE html>.
+// Catches edge cases where thinking text leaks despite filtering.
+function stripToDoctype(text: string): string {
+  const idx = text.indexOf('<!DOCTYPE');
+  if (idx > 0) return text.slice(idx);
+  const htmlIdx = text.indexOf('<html');
+  if (htmlIdx > 0) return text.slice(htmlIdx);
+  return text;
+}
+
 async function streamOnce(
   effectiveKey: string,
   messages: Array<{ role: string; content: string }>,
   temperature: number,
-  onChunk: (chunk: string) => void
+  onChunk: (chunk: string) => void,
+  maxOutputTokens = 16000
 ): Promise<string> {
-  const response = await fetch(`${OPENROUTER_BASE}/chat/completions`, {
+  const url =
+    `${GEMMA_BASE}/models/${ENV.model}:streamGenerateContent` +
+    `?key=${effectiveKey}&alt=sse`;
+
+  const response = await fetch(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${effectiveKey}`,
-      'HTTP-Referer': window.location.origin,
-      'X-Title': 'Alsytes',
-    },
-    body: JSON.stringify({
-      model: ENV.model,
-      stream: true,
-      max_tokens: 32000,
-      temperature,
-      messages,
-    }),
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(toGemmaPayload(messages, temperature, maxOutputTokens)),
   });
 
   if (!response.ok) {
@@ -258,15 +342,10 @@ async function streamOnce(
       if (!trimmed || trimmed === 'data: [DONE]') continue;
       if (!trimmed.startsWith('data: ')) continue;
 
-      try {
-        const json = JSON.parse(trimmed.slice(6));
-        const delta = json.choices?.[0]?.delta?.content;
-        if (delta) {
-          fullText += delta;
-          onChunk(delta);
-        }
-      } catch {
-        // skip malformed SSE chunk
+      const delta = extractGemmaDelta(trimmed.slice(6));
+      if (delta) {
+        fullText += delta;
+        onChunk(delta);
       }
     }
   }
@@ -283,9 +362,9 @@ export async function generateWebsite(
 ): Promise<void> {
   const { onChunk, onDone, onError } = callbacks;
 
-  const effectiveKey = ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_api_key') ?? '';
+  const effectiveKey = ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_gemma_key') ?? '';
   if (!effectiveKey) {
-    onError('No API key found. Set VITE_OPENROUTER_API_KEY in your .env or enter it manually.');
+    onError('No API key found. Set VITE_GEMINI_API_KEY in your .env or enter it manually. Get a free key at ai.google.dev');
     return;
   }
 
@@ -304,11 +383,14 @@ export async function generateWebsite(
           `- For Tools: fully functional logic, real calculations, instant feedback\n` +
           `- For Landing Pages: premium design, Unsplash images, full animations\n` +
           `- The output MUST be a complete HTML document. Do NOT stop before </body> and </html>.\n` +
-          `- Return ONLY the raw HTML code starting with <!DOCTYPE html>.`,
+          `- Return ONLY the raw HTML code starting with <!DOCTYPE html>.\n` +
+          `- You have a LARGE output budget — use it fully. Write dense, rich, detailed code.\n` +
+          `- More CSS animations, more JS interactivity, more HTML content = better output.\n` +
+          `- Do NOT truncate or simplify. Ship the most complete, impressive version possible.`,
       },
     ];
 
-    let accumulated = await streamOnce(effectiveKey, initialMessages, 0.85, onChunk);
+    let accumulated = await streamOnce(effectiveKey, initialMessages, 0.85, onChunk, 16000);
     let cleanedCode = stripFences(accumulated);
 
     let attempts = 0;
@@ -335,19 +417,17 @@ export async function generateWebsite(
         },
       ];
 
-      const continuation = await streamOnce(effectiveKey, continuationMessages, 0.5, onChunk);
+      const continuation = await streamOnce(effectiveKey, continuationMessages, 0.5, onChunk, 16000);
       cleanedCode = stripFences(cleanedCode + continuation);
     }
 
-    onDone(cleanedCode);
+    onDone(stripToDoctype(cleanedCode));
   } catch (err) {
     onError(err instanceof Error ? err.message : 'Unknown error occurred');
   }
 }
 
 // ─── generateWebsiteSummary ───────────────────────────────────────────────────
-// Setelah website selesai, AI menjelaskan ke user apa yang dibuat, fitur apa saja,
-// dan cara menggunakannya — streaming sebagai chat bubble.
 
 const SUMMARY_SYSTEM_PROMPT = `You are Alsytes — a friendly AI website builder assistant. You just finished generating a complete website or web app for the user.
 
@@ -376,14 +456,13 @@ export async function generateWebsiteSummary(
 ): Promise<void> {
   const { onChunk, onDone, onError } = callbacks;
 
-  const effectiveKey = ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_api_key') ?? '';
+  const effectiveKey = ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_gemma_key') ?? '';
   if (!effectiveKey) {
     onError('No API key');
     return;
   }
 
   try {
-    // Kirim 8000 karakter pertama dari HTML sebagai context untuk summary
     const htmlPreview = generatedHtml.slice(0, 8000);
 
     const messages: Array<{ role: string; content: string }> = [
@@ -398,61 +477,7 @@ export async function generateWebsiteSummary(
       },
     ];
 
-    const response = await fetch(`${OPENROUTER_BASE}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${effectiveKey}`,
-        'HTTP-Referer': window.location.origin,
-        'X-Title': 'Alsytes',
-      },
-      body: JSON.stringify({
-        model: ENV.model,
-        stream: true,
-        max_tokens: 1000,
-        temperature: 0.75,
-        messages,
-      }),
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`API Error ${response.status}: ${errText}`);
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) throw new Error('No response body');
-
-    const decoder = new TextDecoder();
-    let fullText = '';
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() ?? '';
-
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed || trimmed === 'data: [DONE]') continue;
-        if (!trimmed.startsWith('data: ')) continue;
-
-        try {
-          const json = JSON.parse(trimmed.slice(6));
-          const delta = json.choices?.[0]?.delta?.content;
-          if (delta) {
-            fullText += delta;
-            onChunk(delta);
-          }
-        } catch {
-          // skip
-        }
-      }
-    }
-
+    const fullText = await streamOnce(effectiveKey, messages, 0.75, onChunk, 1000);
     onDone(fullText);
   } catch (err) {
     onError(err instanceof Error ? err.message : 'Summary generation failed');
@@ -486,9 +511,9 @@ export async function editWebsite(
 ): Promise<void> {
   const { onChunk, onDone, onError } = callbacks;
 
-  const effectiveKey = ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_api_key') ?? '';
+  const effectiveKey = ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_gemma_key') ?? '';
   if (!effectiveKey) {
-    onError('No API key found. Set VITE_OPENROUTER_API_KEY in your .env or enter it manually.');
+    onError('No API key found. Set VITE_GEMINI_API_KEY in your .env or enter it manually. Get a free key at ai.google.dev');
     return;
   }
 
@@ -506,7 +531,7 @@ export async function editWebsite(
       },
     ];
 
-    let accumulated = await streamOnce(effectiveKey, initialMessages, 0.7, onChunk);
+    let accumulated = await streamOnce(effectiveKey, initialMessages, 0.7, onChunk, 16000);
     let cleanedCode = stripFences(accumulated);
 
     let attempts = 0;
@@ -531,11 +556,11 @@ export async function editWebsite(
         },
       ];
 
-      const continuation = await streamOnce(effectiveKey, continuationMessages, 0.4, onChunk);
+      const continuation = await streamOnce(effectiveKey, continuationMessages, 0.4, onChunk, 16000);
       cleanedCode = stripFences(cleanedCode + continuation);
     }
 
-    onDone(cleanedCode);
+    onDone(stripToDoctype(cleanedCode));
   } catch (err) {
     onError(err instanceof Error ? err.message : 'Unknown error occurred');
   }
@@ -597,9 +622,9 @@ export async function surgicalEditWebsite(
 ): Promise<void> {
   const { onPatch, onChunk, onDone, onError } = callbacks;
 
-  const effectiveKey = ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_api_key') ?? '';
+  const effectiveKey = ENV.apiKey ?? apiKey ?? localStorage.getItem('alsytes_gemma_key') ?? '';
   if (!effectiveKey) {
-    onError('No API key found. Set VITE_OPENROUTER_API_KEY in your .env or enter it manually.');
+    onError('No API key found. Set VITE_GEMINI_API_KEY in your .env or enter it manually. Get a free key at ai.google.dev');
     return;
   }
 
@@ -625,94 +650,56 @@ export async function surgicalEditWebsite(
   }
 
   try {
-    const response = await fetch(`${OPENROUTER_BASE}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${effectiveKey}`,
-        'HTTP-Referer': window.location.origin,
-        'X-Title': 'Alsytes',
+    const surgicalMessages: Array<{ role: string; content: string }> = [
+      { role: 'system', content: SURGICAL_EDIT_SYSTEM_PROMPT },
+      {
+        role: 'user',
+        content:
+          `HTML file to edit:\n\`\`\`html\n${currentSourceCode}\n\`\`\`\n\n` +
+          `Edit instructions: ${editPrompt}\n\n` +
+          `Respond with ONLY NDJSON patch lines. ` +
+          `Each line: {"description":"...","search":"exact_verbatim_html_substring","replace":"replacement"}`,
       },
-      body: JSON.stringify({
-        model: ENV.model,
-        stream: true,
-        max_tokens: 8000,
-        temperature: 0.2,
-        messages: [
-          { role: 'system', content: SURGICAL_EDIT_SYSTEM_PROMPT },
-          {
-            role: 'user',
-            content:
-              `HTML file to edit:\n\`\`\`html\n${currentSourceCode}\n\`\`\`\n\n` +
-              `Edit instructions: ${editPrompt}\n\n` +
-              `Respond with ONLY NDJSON patch lines. ` +
-              `Each line: {"description":"...","search":"exact_verbatim_html_substring","replace":"replacement"}`,
-          },
-        ],
-      }),
-    });
+    ];
 
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`API Error ${response.status}: ${errText}`);
-    }
-
-    const reader = response.body?.getReader();
-    if (!reader) throw new Error('No response body received');
-
-    const decoder = new TextDecoder();
-    let sseBuffer = '';
     let lineBuffer = '';
     let currentCode = currentSourceCode;
     let patchCount = 0;
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+    // Stream and process patches line by line as they arrive
+    await streamOnce(
+      effectiveKey,
+      surgicalMessages,
+      0.2,
+      (delta) => {
+        onChunk(delta);
+        lineBuffer += delta;
 
-      sseBuffer += decoder.decode(value, { stream: true });
-      const sseLines = sseBuffer.split('\n');
-      sseBuffer = sseLines.pop() ?? '';
+        let nlIdx: number;
+        while ((nlIdx = lineBuffer.indexOf('\n')) !== -1) {
+          const completeLine = lineBuffer.slice(0, nlIdx).trim();
+          lineBuffer = lineBuffer.slice(nlIdx + 1);
+          if (!completeLine) continue;
 
-      for (const sseLine of sseLines) {
-        const t = sseLine.trim();
-        if (!t || t === 'data: [DONE]') continue;
-        if (!t.startsWith('data: ')) continue;
+          try {
+            const patch = JSON.parse(completeLine) as EditPatch;
+            if (!patch.description || typeof patch.search !== 'string' || typeof patch.replace !== 'string') continue;
 
-        try {
-          const json = JSON.parse(t.slice(6));
-          const delta = json.choices?.[0]?.delta?.content;
-          if (!delta) continue;
-
-          onChunk(delta);
-          lineBuffer += delta;
-
-          let nlIdx: number;
-          while ((nlIdx = lineBuffer.indexOf('\n')) !== -1) {
-            const completeLine = lineBuffer.slice(0, nlIdx).trim();
-            lineBuffer = lineBuffer.slice(nlIdx + 1);
-            if (!completeLine) continue;
-
-            try {
-              const patch = JSON.parse(completeLine) as EditPatch;
-              if (!patch.description || typeof patch.search !== 'string' || typeof patch.replace !== 'string') continue;
-
-              const result = applyPatch(currentCode, patch);
-              if (result.success) {
-                currentCode = result.code;
-                patchCount++;
-              }
-              onPatch(patch, currentCode, result.success);
-            } catch {
-              // not valid JSON yet
+            const result = applyPatch(currentCode, patch);
+            if (result.success) {
+              currentCode = result.code;
+              patchCount++;
             }
+            onPatch(patch, currentCode, result.success);
+          } catch {
+            // not valid JSON yet — skip
           }
-        } catch {
-          // Skip malformed SSE
         }
-      }
-    }
+      },
+      8000
+    );
 
+    // Process any remaining buffered line
     const remaining = lineBuffer.trim();
     if (remaining) {
       try {
@@ -729,6 +716,7 @@ export async function surgicalEditWebsite(
     }
 
     if (patchCount === 0) {
+      // Fallback to full rewrite if no patches applied
       await editWebsite(apiKey, currentSourceCode, editPrompt, {
         onChunk,
         onDone: (code) => onDone(code, 0),

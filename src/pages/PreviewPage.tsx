@@ -254,7 +254,7 @@ export default function PreviewPage() {
     setCodePanelTab('view');
     prevSourceRef.current = website.source_code;
 
-    const apiKey = localStorage.getItem('alsytes_api_key') ?? undefined;
+    const apiKey = localStorage.getItem('alsytes_gemma_key') ?? undefined;
 
     await surgicalEditWebsite(
       ENV.apiKey ?? apiKey,
