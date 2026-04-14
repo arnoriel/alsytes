@@ -112,7 +112,7 @@ export default function TopUpModal({ open, onClose, preselectedPackage }: TopUpM
   const handleWhatsApp = () => {
     if (!selected) return;
     const msg = encodeURIComponent(
-      `Halo Admin Alsytes! Saya sudah transfer untuk paket *${selected.name}* (${selected.credits} Credits) sebesar *${formatRupiah(selected.price)}*.\n\nMohon konfirmasi penambahan credits ke akun saya. Terima kasih! 🙏`
+      `Halo Admin Alsytes! Saya sudah transfer untuk paket *${selected.name}* (${selected.credits} Credits) sebesar *${formatRupiah(selected.price)}*.\n\nMohon konfirmasi penambahan credits ke akun saya. Terima kasih!`
     );
     window.open(`https://wa.me/${ADMIN_WA_NUMBER}?text=${msg}`, '_blank');
   };
@@ -367,7 +367,7 @@ export default function TopUpModal({ open, onClose, preselectedPackage }: TopUpM
                     <div className="flex flex-col gap-2.5">
                       {[
                         { n: '1', text: 'Transfer ke no. rekening di atas tepat sesuai nominal' },
-                        { n: '2', text: 'Setelah transfer, kirim bukti pembayaran via WhatsApp' },
+                        { n: '2', text: 'Setelah transfer, kirim screenshot bukti pembayaran via WhatsApp' },
                         { n: '3', text: 'Tunggu konfirmasi admin — credits akan ditambahkan segera' },
                       ].map((s) => (
                         <div key={s.n} className="flex items-start gap-3">
