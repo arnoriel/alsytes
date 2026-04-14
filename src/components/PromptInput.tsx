@@ -160,7 +160,7 @@ export default function PromptInput({ onSubmit, status, suggestedPrompt, onSugge
           onChange={(e) => { setPrompt(e.target.value); autoResize(); }}
           onKeyDown={handleKeyDown}
           disabled={isGenerating}
-          placeholder="Deskripsikan apa yang mau dibikin — landing page, game, SaaS app, tool, atau apapun..."
+          placeholder="Deskripsikan apa yang mau dibikin — landing page, game, blog, tool, atau apapun..."
           rows={3}
           className="w-full bg-transparent text-sm leading-relaxed px-3.5 md:px-4 py-2 resize-none outline-none disabled:opacity-50"
           style={{

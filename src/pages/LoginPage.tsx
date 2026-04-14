@@ -63,7 +63,7 @@ export default function LoginPage() {
           <div className="flex flex-col gap-3">
             {[
               { icon: Globe, label: 'Landing Pages & Portfolios', color: 'text-violet-600 bg-violet-50 border-violet-100' },
-              { icon: Layers, label: 'SaaS Apps & Dashboards', color: 'text-orange-600 bg-orange-50 border-orange-100' },
+              { icon: Layers, label: 'Blog & Articles', color: 'text-orange-600 bg-orange-50 border-orange-100' },
               { icon: Zap, label: 'Games & Interactive Tools', color: 'text-red-500 bg-red-50 border-red-100' },
             ].map((f) => {
               const Icon = f.icon;

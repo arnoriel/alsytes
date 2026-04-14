@@ -23,7 +23,6 @@ type HomeMode = 'select' | 'prompt' | 'form';
 type WebsiteCategory =
   | 'landing-page'
   | 'portfolio'
-  | 'saas-app'
   | 'game'
   | 'tool'
   | 'ecommerce'
@@ -38,7 +37,6 @@ interface FormData {
 const CATEGORY_OPTIONS: { value: WebsiteCategory; label: string; icon: React.ElementType; desc: string; color: string }[] = [
   { value: 'landing-page', label: 'Landing Page', icon: Globe, desc: 'Marketing or company site', color: 'text-violet-600 bg-violet-50 border-violet-100' },
   { value: 'portfolio', label: 'Portfolio', icon: Sparkles, desc: 'Showcase your work', color: 'text-blue-600 bg-blue-50 border-blue-100' },
-  { value: 'saas-app', label: 'SaaS / App', icon: LayoutDashboard, desc: 'Dashboard, CRM, kanban', color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
   { value: 'game', label: 'Game', icon: Gamepad2, desc: 'Arcade, puzzle, quiz, RPG', color: 'text-orange-600 bg-orange-50 border-orange-100' },
   { value: 'tool', label: 'Tool / Utility', icon: Wrench, desc: 'Calculator, converter, gen', color: 'text-amber-600 bg-amber-50 border-amber-100' },
   { value: 'ecommerce', label: 'E-commerce', icon: ChevronRight, desc: 'Shop, product listing', color: 'text-pink-600 bg-pink-50 border-pink-100' },
@@ -60,13 +58,6 @@ const FORM_STEPS: Record<WebsiteCategory, { key: string; question: string; place
     { key: 'skills', question: 'What are your main skills or services?', placeholder: 'e.g. Figma, React, branding, portrait photography...', type: 'text' },
     { key: 'style', question: 'What aesthetic vibe do you want?', placeholder: 'e.g. Minimal & elegant, dark & dramatic, colorful & playful...', type: 'text' },
     { key: 'contact', question: 'How should visitors contact you?', placeholder: 'e.g. Email form, WhatsApp, LinkedIn...', type: 'text' },
-  ],
-  'saas-app': [
-    { key: 'appName', question: 'What is your app called?', placeholder: 'e.g. TaskFlow, BudgetPro...', type: 'text' },
-    { key: 'purpose', question: 'What problem does it solve?', placeholder: 'e.g. Track team tasks across projects, manage freelance invoices...', type: 'text' },
-    { key: 'features', question: 'List the core features you need', placeholder: 'e.g. Dashboard with stats, task CRUD, calendar view, user roles...', type: 'text' },
-    { key: 'users', question: 'Who will use this app?', placeholder: 'e.g. Solo freelancers, small teams of 5-20...', type: 'text' },
-    { key: 'style', question: 'What UI style do you want?', placeholder: 'e.g. Linear-like dark, Notion-like minimal, Trello-like colorful...', type: 'text' },
   ],
   'game': [
     { key: 'gameType', question: 'What type of game do you want?', placeholder: 'e.g. Snake, Tetris, quiz, platformer, RPG, puzzle...', type: 'text' },
@@ -120,9 +111,9 @@ function buildPromptFromForm(formData: FormData, category: WebsiteCategory): str
 
 // ── Idea cards for Free Prompt mode ──────────────────────────────
 const IDEA_CARDS = [
-  { emoji: '🚀', label: 'SaaS Landing Page', prompt: 'Landing page untuk startup SaaS dengan dark theme elegan, hero section dengan animasi, pricing table, dan testimonials', color: 'rgba(124,58,237,0.06)', border: 'rgba(124,58,237,0.15)', accent: '#7C3AED' },
+  { emoji: '🚀', label: 'Landing Page', prompt: 'Landing page untuk startup Company dengan dark theme elegan, hero section dengan animasi, pricing table, dan testimonials', color: 'rgba(124,58,237,0.06)', border: 'rgba(124,58,237,0.15)', accent: '#7C3AED' },
   { emoji: '🎮', label: 'Arcade Game', prompt: 'Buat game Snake classic versi modern — dark neon aesthetic, high score tersimpan, level progression, dan animasi smooth', color: 'rgba(249,115,22,0.06)', border: 'rgba(249,115,22,0.18)', accent: '#F97316' },
-  { emoji: '📊', label: 'SaaS Dashboard', prompt: 'Dashboard CRM untuk freelancer — manage clients, projects, invoice tracker, stats cards, dan data table yang interaktif', color: 'rgba(16,185,129,0.06)', border: 'rgba(16,185,129,0.18)', accent: '#10B981' },
+  { emoji: '📊', label: 'Blog & Article', prompt: 'Blog serta isi isi article personal dengan aesthetic modern, layout yang rapi, dan fitur search & filter', color: 'rgba(16,185,129,0.06)', border: 'rgba(16,185,129,0.18)', accent: '#10B981' },
   { emoji: '🎨', label: 'Portfolio', prompt: 'Portfolio fotografer profesional dengan aesthetic film noir hitam putih, galeri masonry, smooth hover effects, dan contact form', color: 'rgba(59,130,246,0.06)', border: 'rgba(59,130,246,0.18)', accent: '#3B82F6' },
   { emoji: '🛠️', label: 'Utility Tool', prompt: 'Kalkulator BMI + kalori harian — input berat/tinggi/usia, hasil instant dengan chart, dan history 10 terakhir tersimpan', color: 'rgba(245,158,11,0.06)', border: 'rgba(245,158,11,0.18)', accent: '#F59E0B' },
   { emoji: '🛒', label: 'E-commerce', prompt: 'Toko online boutique fashion lokal — product grid dengan filter kategori, detail produk, keranjang belanja, dan checkout flow', color: 'rgba(236,72,153,0.06)', border: 'rgba(236,72,153,0.18)', accent: '#EC4899' },
@@ -274,7 +265,7 @@ export default function Home() {
   const CAPABILITIES = [
     { icon: Globe, label: 'Landing Pages', desc: 'Marketing, portfolio, company sites', color: 'text-violet-600 bg-violet-50 border-violet-100' },
     { icon: Gamepad2, label: 'Games', desc: 'Arcade, puzzle, quiz, platformer', color: 'text-orange-600 bg-orange-50 border-orange-100' },
-    { icon: LayoutDashboard, label: 'SaaS / Apps', desc: 'Dashboard, CRM, todo, kanban', color: 'text-blue-600 bg-blue-50 border-blue-100' },
+    { icon: LayoutDashboard, label: 'Blog & Articles', desc: 'News, articles, personal blog', color: 'text-blue-600 bg-blue-50 border-blue-100' },
     { icon: Wrench, label: 'Tools', desc: 'Calculator, converter, generator', color: 'text-amber-600 bg-amber-50 border-amber-100' },
   ];
 

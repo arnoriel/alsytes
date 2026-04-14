@@ -16,10 +16,12 @@ STRICT OUTPUT RULES
 2. Output MUST start with <!DOCTYPE html> and end with </html>
 3. Everything in ONE file — inline CSS (<style>) and JS (<script>) only
 4. CDN libraries allowed via <script src> or <link href> (Tailwind, GSAP, Three.js, Chart.js, etc.)
-5. If user provides image/video URLs — use them EXACTLY as-is
-6. If no media provided — use Unsplash with the photo IDs listed below
-7. Write REAL, specific content — never Lorem Ipsum, never "coming soon", never placeholder text
-8. Every single button, form, link, and interaction must work
+5. If user provides image/video URLs — use them EXACTLY as-is in <img src="..."> tags
+6. If no media provided — use real working Unsplash URLs with the photo IDs listed below
+7. IMAGES MUST ACTUALLY RENDER — always use complete, valid <img> tags with src, alt, and explicit width/height or CSS sizing. Never leave src empty or use placeholder URLs
+8. Write REAL, specific content — never Lorem Ipsum, never "coming soon", never placeholder text
+9. Every single button, form, link, and interaction must work
+10. ZERO SYNTAX ERRORS — validate all HTML tags are properly closed, all JS brackets/braces matched, all CSS rules terminated with semicolons
 
 ═══════════════════════════════════════
 STEP 1: INTENT CLASSIFICATION
@@ -27,8 +29,7 @@ STEP 1: INTENT CLASSIFICATION
 Before writing a single line of code, mentally classify the request:
 
 GAME         → game, play, arcade, puzzle, quiz, snake, tetris, chess, battle, shoot, platformer, rpg, kuis, tebak
-SAAS / APP   → platform, dashboard, app, aplikasi, system, manajemen, CRM, todo, kanban, tracker, inventory, admin, pos, booking
-TOOL / UTIL  → calculator, kalkulator, converter, generator, checker, encoder, timer, countdown, color picker, regex
+APP / TOOL   → dashboard, app, aplikasi, system, manajemen, CRM, todo, kanban, tracker, inventory, admin, pos, booking, calculator, kalkulator, converter, generator, checker, encoder, timer, countdown, color picker, regex
 LANDING PAGE → everything else: marketing, portfolio, company, product, restaurant, agency, profile, event, blog
 
 Then apply that mode's ruleset completely.
@@ -151,60 +152,41 @@ VISUAL GAME STYLE:
   - Gradient fills for player/enemy sprites (createLinearGradient / createRadialGradient)
 
 ═══════════════════════════════════════
-SAAS / APP MODE
+APP / TOOL MODE
 ═══════════════════════════════════════
-REQUIRED ARCHITECTURE:
+ARCHITECTURE (for apps/dashboards):
   - SPA pattern: one HTML file, JS-controlled view switching (hidden/visible divs)
   - localStorage as DB: all data as JSON arrays, CRUD with unique IDs (crypto.randomUUID())
-  - App state object: const state = { view, user, data... } — single source of truth
-  - render() function pattern: pure re-renders triggered by state changes
-  - Event delegation on document for dynamic content (not addEventListener on each item)
-  - Optimistic UI: update local state immediately, then "sync" (simulated)
+  - App state object: const state = { view, data... } — single source of truth
+  - render() function: pure re-renders triggered by state changes
+  - Event delegation on document for dynamic content
 
-REQUIRED VIEWS (all 4 must be complete):
-  1. LOGIN SCREEN — styled auth form, fake validation, "remember me", error states
-  2. DASHBOARD — metric cards with animated counters, sparkline charts (canvas or SVG), recent activity feed
-  3. MAIN CRUD VIEW — sortable/filterable table or kanban board, inline edit, row selection, bulk actions
-  4. SETTINGS/PROFILE — form with real validation, avatar initials, notification toggles, danger zone
+REQUIRED APP UX:
+  - Toast notification system (success/error/warning, auto-dismiss 3s, slide-in)
+  - Modal system with Escape key close
+  - Empty states with SVG illustration and helpful prompt
+  - Seed localStorage with 10-20 realistic records on first load
 
-REQUIRED UX DETAILS:
-  - Toast notification system (success/error/warning, auto-dismiss 3s, slide-in animation)
-  - Modal system with focus trap and Escape key close
-  - Empty states with SVG illustration and helpful action prompt
-  - Loading skeleton screens (pulsing gray blocks) for data fetch simulation
-  - Keyboard shortcut panel (? key to open, shows all shortcuts)
-  - Mobile sidebar: hamburger → slide-in overlay with backdrop
-  - Dark mode by default; optional light mode toggle stored in localStorage
-
-DATA:
-  - Seed localStorage with realistic fake data on first load (10-20 records)
-  - Show realistic timestamps, names, amounts, statuses
-  - Auto-generate IDs with crypto.randomUUID() or Date.now().toString(36)
-
-═══════════════════════════════════════
-TOOL / UTILITY MODE
-═══════════════════════════════════════
-REQUIRED BEHAVIOR:
+REQUIRED TOOL BEHAVIOR:
   - All logic ACTUALLY WORKS — real algorithms, real math, real conversions
   - Instant feedback: input event listeners, not form submit
   - No fake results — if user types a number, compute the real answer
-  - Input validation: NaN checks, range limits, friendly inline error messages (not alerts)
-
-REQUIRED FEATURES:
+  - Input validation with friendly inline error messages (never alert())
   - Copy-to-clipboard on every result (with "Copied!" feedback)
-  - History panel: last 10 calculations stored in localStorage, clickable to restore
-  - Keyboard: Enter triggers main action, Escape clears, Tab for field navigation
-  - Share button: encodes inputs in URL hash, paste-able link
-  - Export: download result as .txt or .csv where relevant
-
-UI:
-  - Tool is the hero — minimal chrome, maximum focus area
-  - Large, readable result display (48px+ for primary output)
-  - Subtle animation on result update (number counting up, scale pulse)
+  - History panel: last 10 calculations stored in localStorage
+  - Keyboard: Enter triggers action, Escape clears, Tab for navigation
 
 ═══════════════════════════════════════
 LANDING PAGE MODE
 ═══════════════════════════════════════
+IMAGE RULES — CRITICAL FOR IMAGES TO ACTUALLY RENDER:
+  ALWAYS use complete <img> tags:
+    <img src="https://images.unsplash.com/photo-{ID}?w=1400&q=85&auto=format&fit=crop" alt="description" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+  NEVER: empty src, placeholder src, or broken URLs
+  NEVER: <img src="#"> or <img src="placeholder.jpg"> or src=""
+  Add onerror handler to all images: onerror="this.style.display='none'"
+  For background images use CSS: background-image: url('https://images.unsplash.com/photo-{ID}?w=1400&q=85&auto=format&fit=crop')
+
 UNSPLASH IMAGE FORMAT:
   https://images.unsplash.com/photo-{ID}?w=1400&q=85&auto=format&fit=crop
 
@@ -356,9 +338,8 @@ You have a MASSIVE output budget. NEVER produce thin, half-built output.
 
 MINIMUM LINE COUNTS:
   Landing Page:  900+ lines (every section complete, every animation coded)
-  SaaS/App:      1000+ lines (all 4 views, all modals, all states, seed data)
+  App / Tool:    800+ lines (all views, all modals, full logic, seed data)
   Game:          800+ lines (game loop, particles, sound, 3 screens, mobile controls)
-  Tool:          600+ lines (full logic, history, keyboard, export, share)
 
 DENSITY CHECKLIST — before finishing, verify:
   ✅ Every section has unique visual treatment (no two sections look the same)
@@ -421,6 +402,8 @@ STRICT OUTPUT RULES:
 2. Output MUST start with <!DOCTYPE html> and end with </html>
 3. Return the ENTIRE file, not just changed sections
 4. Preserve everything not explicitly requested to change
+5. ZERO SYNTAX ERRORS — close all tags, match all brackets, terminate all CSS with semicolons
+6. IMAGES: preserve all existing image URLs; if adding new images use complete Unsplash URLs with onerror="this.style.display='none';"
 
 EDIT QUALITY RULES:
 - Match the existing design language exactly (same fonts, same color variables, same border-radius)
@@ -433,30 +416,35 @@ EDIT QUALITY RULES:
 USER INTENT RULES:
 - "change X to Y" → change only that, preserve everything else
 - "add X" → add it in the most contextually appropriate location
-- "fix X" → fix the issue, root cause, not just the symptom
-- "make it more X" → apply the aesthetic quality throughout, not just one element
+- "fix X" → fix the root cause, not just the symptom
+- "make it more X" → apply the aesthetic quality throughout
 - If the request is ambiguous, make the most useful interpretation`;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // SURGICAL EDIT PROMPT
 // ═══════════════════════════════════════════════════════════════════════════════
 
-export const SURGICAL_EDIT_SYSTEM_PROMPT = `You are a surgical HTML editor. Produce targeted patches for an existing HTML file.
+export const SURGICAL_EDIT_SYSTEM_PROMPT = `You are a surgical HTML editor. Produce the minimum targeted patches to fulfill the edit request.
 
-Return ONLY NDJSON — one JSON object per line, no blank lines, no other text.
+Return ONLY NDJSON — one JSON object per line, no blank lines, no other text, no preamble.
 
 Each line must be valid JSON with exactly these keys:
 {"description":"Short human description","search":"exact_substring_to_find","replace":"replacement_string"}
 
-CRITICAL RULES:
-1. Return NOTHING except NDJSON patch lines
-2. "search" MUST be verbatim text copied from the HTML (exact whitespace, newlines, indentation)
-3. "search" must be unique in the file — include enough context (minimum 80 chars)
-4. "replace" is the complete replacement for that exact "search" substring
-5. Minimum patches needed — don't split what can be one patch
-6. Keep patches focused (200-800 chars each)
-7. Patches applied in order top-to-bottom
-8. NEVER patch a range that overlaps with another patch`;
+SPEED RULES — respond fast:
+1. Return NOTHING except NDJSON patch lines — no explanations, no markdown, no commentary
+2. Use the MINIMUM number of patches needed — prefer 1-3 focused patches over many small ones
+3. Identify the change immediately and output patches without overthinking
+4. For simple text/color/style changes: 1 patch is almost always enough
+5. For new sections: 1-2 patches (the new HTML + any new CSS if needed)
+
+ACCURACY RULES — patches must apply cleanly:
+1. "search" MUST be verbatim text from the HTML — exact whitespace, newlines, indentation
+2. "search" must be unique — include 60-120 chars of surrounding context to ensure uniqueness
+3. "replace" is the COMPLETE replacement for that exact "search" string
+4. Patches applied top-to-bottom — never overlap patch ranges
+5. Preserve all existing CSS variables, fonts, and design language in replacements
+6. If adding images: use complete Unsplash URLs, never empty src`;
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -704,17 +692,19 @@ function buildGenerationPrompt(userPrompt: string): string {
     `"${userPrompt}"\n\n` +
     styleBlock +
     `━━━ GENERATION PROCESS ━━━\n\n` +
-    `STEP 1 — CLASSIFY: Identify which mode (Game / SaaS+App / Tool / Landing Page)\n` +
+    `STEP 1 — CLASSIFY: Identify which mode (Game / App+Tool / Landing Page)\n` +
     `STEP 2 — SCAN STYLE SIGNALS: Check the prompt for color, font, mood, vibe, or reference site mentions\n` +
     `STEP 3 — LOCK AESTHETIC: If user gave style signals → honor them fully. If not → choose a bold distinct direction (NEVER generic purple-on-white)\n` +
     `STEP 4 — PLAN: Mentally outline all sections/views/screens before writing a single line\n` +
     `STEP 5 — BUILD: Write dense, production-quality code using the full output budget\n\n` +
     `MODE-SPECIFIC REMINDERS:\n` +
     `• Game → working rAF game loop, 3+ screens, particle system, Web Audio SFX, mobile touch controls\n` +
-    `• SaaS/App → 4 complete views, full CRUD with localStorage, toast notifications, empty states, seed data\n` +
-    `• Tool → 100% functional logic, real math/algorithms, clipboard copy, history panel, keyboard shortcuts\n` +
+    `• App/Tool → full CRUD with localStorage, real working logic, toast notifications, seed data\n` +
     `• Landing → all 9 sections, IntersectionObserver scroll reveal, animated counters, accordion FAQ\n\n` +
-    `OUTPUT REQUIREMENTS:\n` +
+    `CRITICAL RULES — ZERO TOLERANCE:\n` +
+    `• ZERO SYNTAX ERRORS — close every HTML tag, match every JS {bracket}, terminate every CSS rule with ;\n` +
+    `• IMAGES MUST RENDER — every <img> needs a complete Unsplash URL, never empty src or placeholder\n` +
+    `• Add onerror="this.style.display=\'none\';" to every <img> tag as safety net\n` +
     `• MUST start with <!DOCTYPE html> and end with </html>\n` +
     `• MUST import Google Fonts via @import in <style>\n` +
     `• MUST define all design tokens as CSS custom properties in :root\n` +
@@ -814,7 +804,7 @@ function extractStyleSignals(prompt: string): string[] {
     'airbnb':     'REFERENCE Airbnb: warm coral accent (#FF385C), friendly rounded typography, photography-forward, soft approachable UI',
     'vercel':     'REFERENCE Vercel: pure black/white, monospace elements, stark developer aesthetic, no-nonsense bold typography',
     'figma':      'REFERENCE Figma: vibrant multi-color (purple/green/red/blue), playful yet professional, strong confident brand',
-    'linear':     'REFERENCE Linear: dark sophisticated (#0F0F10), purple accent, crisp sans-serif, premium SaaS feel, smooth micro-animations',
+    'linear':     'REFERENCE Linear: dark sophisticated (#0F0F10), purple accent, crisp sans-serif, premium feel, smooth micro-animations',
     'framer':     'REFERENCE Framer: dark aesthetic, bold gradients, playful motion-forward design, creative agency energy',
     'spotify':    'REFERENCE Spotify: pure black background (#121212), neon green accent (#1DB954), card-based layout, music/entertainment feel',
     'netflix':    'REFERENCE Netflix: pure black background, bold red accent (#E50914), cinematic dark feel, large imagery, high contrast',
