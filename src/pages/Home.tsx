@@ -9,6 +9,8 @@ import {
 import Sidebar from '../components/Sidebar';
 import PromptInput from '../components/PromptInput';
 import GenerationPanel from '../components/GenerationPanel';
+import CreditModal from '../components/CreditModal';
+import CreditBadge from '../components/CreditBadge';
 import type { Website, GenerationStatus } from '../types';
 import { storage } from '../lib/storage';
 import { generateWebsite, generateWebsiteSummary, extractWebsiteName } from '../lib/ai';
@@ -130,8 +132,9 @@ const IDEA_CARDS = [
 export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, credits, consumeCredit } = useAuth();
 
+  const [creditModalOpen, setCreditModalOpen] = useState(false);
   const [websites, setWebsites] = useState<Website[]>([]);
   const [activeId, setActiveId] = useState<string | undefined>();
   const [status, setStatus] = useState<GenerationStatus>('idle');
@@ -167,6 +170,12 @@ export default function Home() {
   }, []);
 
   const handleGenerate = useCallback(async (prompt: string, apiKey: string) => {
+    // ── Credit guard ─────────────────────────────────────────────
+    if (credits !== null && credits <= 0) {
+      setCreditModalOpen(true);
+      return;
+    }
+
     setMode('prompt');
     setStatus('thinking');
     setStreamedCode('');
@@ -203,6 +212,9 @@ export default function Home() {
         setStatus('done');
         await refreshWebsites();
 
+        // ── Deduct 1 credit on successful website creation ────────
+        await consumeCredit();
+
         setSummaryStatus('generating');
         let summaryAcc = '';
         await generateWebsiteSummary(apiKey, prompt, fullCode, {
@@ -218,7 +230,7 @@ export default function Home() {
         await refreshWebsites();
       },
     });
-  }, [refreshWebsites]);
+  }, [refreshWebsites, credits, consumeCredit]);
 
   const handleFormSubmit = () => {
     if (!formData.category) return;
@@ -318,6 +330,7 @@ export default function Home() {
           </div>
 
           <div className="flex items-center gap-2">
+            <CreditBadge credits={credits} onClick={() => credits === 0 ? setCreditModalOpen(true) : undefined} />
             <span
               className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium"
               style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.20)', color: '#10B981' }}
@@ -706,8 +719,8 @@ export default function Home() {
           </AnimatePresence>
         </main>
 
-        {/* Bottom input — only shown while AI is generating/done so user can re-prompt */}
-        {isGenerating && (
+        {/* Bottom input — hidden, user re-prompts from main area */}
+        {false && (
           <div
             className="flex-shrink-0 px-3 md:px-6 py-3 md:py-4"
             style={{
@@ -722,6 +735,9 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* ── Credit empty modal ── */}
+      <CreditModal open={creditModalOpen} onClose={() => setCreditModalOpen(false)} />
     </div>
   );
 }

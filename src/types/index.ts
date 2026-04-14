@@ -20,3 +20,12 @@ export type GenerationStatus =
   | 'streaming'
   | 'done'
   | 'error';
+
+export interface UserCredits {
+  id: string;
+  user_id: string;
+  credits: number;
+  reset_at: string;
+  created_at: string;
+  updated_at: string;
+}

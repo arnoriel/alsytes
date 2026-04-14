@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../components/AuthProvider';
 import { signInWithGoogle } from '../lib/supabase';
+import TopUpModal, { CREDIT_PACKAGES, type CreditPackage } from '../components/TopUpModal';
 
 export default function LandingPage() {
   const { user, loading } = useAuth();
@@ -18,6 +19,8 @@ export default function LandingPage() {
   const [authLoading, setAuthLoading] = useState(false);
   const [authError, setAuthError] = useState('');
   const [scrolled, setScrolled] = useState(false);
+  const [topUpOpen, setTopUpOpen] = useState(false);
+  const [topUpPackage, setTopUpPackage] = useState<CreditPackage | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // If user just logged in and there's a pending prompt, redirect to home with it
@@ -61,6 +64,11 @@ export default function LandingPage() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') handleContinue();
+  };
+
+  const openTopUp = (pkg?: CreditPackage) => {
+    setTopUpPackage(pkg ?? null);
+    setTopUpOpen(true);
   };
 
   const FEATURES = [
@@ -643,11 +651,12 @@ export default function LandingPage() {
 
       {/* ── Pricing ──────────────────────────────────────────── */}
       <section id="pricing" className="py-20 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
+            className="text-center mb-4"
           >
             <span
               className="inline-block px-3 py-1.5 rounded-full text-xs font-semibold mb-4"
@@ -655,51 +664,181 @@ export default function LandingPage() {
             >
               Pricing
             </span>
-            <h2 className="text-3xl sm:text-4xl font-800 mb-12" style={{ fontWeight: 800 }}>
-              Simple, transparent pricing
+            <h2 className="text-3xl sm:text-4xl font-800 mb-3" style={{ fontWeight: 800 }}>
+              Bayar sesuai yang kamu butuhkan
             </h2>
+            <p className="text-base mb-10" style={{ color: '#9A96B0' }}>
+              Mulai gratis 3 credits setiap bulan. Top up kapan saja, tanpa langganan.
+            </p>
+          </motion.div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
-              {/* Free */}
-              <div className="p-8 rounded-2xl border text-left" style={{ background: '#fff', borderColor: '#E2DFEF' }}>
-                <h3 className="text-lg font-700 mb-1" style={{ fontWeight: 700 }}>Free</h3>
-                <p className="text-3xl font-800 mb-1" style={{ fontWeight: 800 }}>$0<span className="text-base font-400" style={{ fontWeight: 400, color: '#9A96B0' }}>/mo</span></p>
-                <p className="text-sm mb-6" style={{ color: '#9A96B0' }}>Perfect to get started</p>
-                <div className="flex flex-col gap-3">
-                  {['5 websites/month', 'AI generation', 'Public sharing', 'Community support'].map((f) => (
-                    <div key={f} className="flex items-center gap-2.5 text-sm">
-                      <Check size={15} className="text-emerald-500 flex-shrink-0" />
-                      <span style={{ color: '#4A4660' }}>{f}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Pro */}
-              <div
-                className="p-8 rounded-2xl text-left relative overflow-hidden"
-                style={{ background: 'linear-gradient(135deg, #7C3AED, #9333EA 50%, #F97316)', color: '#fff' }}
-              >
-                <div
-                  className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-semibold"
-                  style={{ background: 'rgba(255,255,255,0.2)' }}
-                >
-                  Popular
-                </div>
-                <h3 className="text-lg font-700 mb-1" style={{ fontWeight: 700, color: '#fff' }}>Pro</h3>
-                <p className="text-3xl font-800 mb-1" style={{ fontWeight: 800, color: '#fff' }}>$12<span className="text-base font-400" style={{ fontWeight: 400, opacity: 0.7 }}>/mo</span></p>
-                <p className="text-sm mb-6" style={{ opacity: 0.75 }}>For serious creators</p>
-                <div className="flex flex-col gap-3">
-                  {['Unlimited websites', 'Priority AI generation', 'Custom domains', 'Advanced editing', 'Priority support'].map((f) => (
-                    <div key={f} className="flex items-center gap-2.5 text-sm">
-                      <Check size={15} className="flex-shrink-0" style={{ color: 'rgba(255,255,255,0.9)' }} />
-                      <span style={{ color: 'rgba(255,255,255,0.9)' }}>{f}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+          {/* Free monthly badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex items-center justify-center mb-8"
+          >
+            <div
+              className="inline-flex items-center gap-2.5 px-5 py-3 rounded-2xl text-sm font-semibold"
+              style={{
+                background: 'linear-gradient(135deg, rgba(124,58,237,0.08), rgba(249,115,22,0.06))',
+                border: '1.5px solid rgba(124,58,237,0.22)',
+                color: '#7C3AED',
+              }}
+            >
+              <Sparkles size={14} />
+              Semua user dapat <strong>3 Credits GRATIS</strong> setiap bulan — otomatis reset tiap tanggal 1
             </div>
           </motion.div>
+
+          {/* Package cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {CREDIT_PACKAGES.map((pkg, i) => (
+              <motion.div
+                key={pkg.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="relative rounded-3xl overflow-hidden flex flex-col"
+                style={{
+                  background: pkg.highlight
+                    ? 'linear-gradient(160deg, #7C3AED 0%, #9333EA 50%, #C026D3 100%)'
+                    : '#fff',
+                  border: pkg.highlight ? 'none' : '1.5px solid #E2DFEF',
+                  boxShadow: pkg.highlight
+                    ? '0 20px 60px rgba(124,58,237,0.30)'
+                    : '0 4px 16px rgba(60,40,120,0.06)',
+                }}
+              >
+                {/* Popular badge */}
+                {pkg.badge && (
+                  <div
+                    className="absolute top-4 right-4 px-2.5 py-1 rounded-full text-[10px] font-bold"
+                    style={{
+                      background: pkg.highlight ? 'rgba(255,255,255,0.22)' : pkg.badgeColor,
+                      color: pkg.highlight ? '#fff' : '#fff',
+                    }}
+                  >
+                    {pkg.badge}
+                  </div>
+                )}
+
+                <div className="p-7 flex flex-col flex-1">
+                  {/* Credits count */}
+                  <div
+                    className="w-14 h-14 rounded-2xl flex flex-col items-center justify-center mb-5"
+                    style={{
+                      background: pkg.highlight ? 'rgba(255,255,255,0.18)' : 'rgba(124,58,237,0.08)',
+                      border: pkg.highlight ? '1px solid rgba(255,255,255,0.25)' : '1px solid rgba(124,58,237,0.18)',
+                    }}
+                  >
+                    <span
+                      className="text-2xl font-black leading-none"
+                      style={{ color: pkg.highlight ? '#fff' : '#7C3AED' }}
+                    >
+                      {pkg.credits}
+                    </span>
+                    <span
+                      className="text-[9px] font-semibold uppercase tracking-wide"
+                      style={{ color: pkg.highlight ? 'rgba(255,255,255,0.7)' : '#9A96B0' }}
+                    >
+                      credit{pkg.credits > 1 ? 's' : ''}
+                    </span>
+                  </div>
+
+                  <h3
+                    className="text-xl font-bold mb-1"
+                    style={{ color: pkg.highlight ? '#fff' : '#14121F' }}
+                  >
+                    {pkg.name}
+                  </h3>
+
+                  <p
+                    className="text-sm mb-4"
+                    style={{ color: pkg.highlight ? 'rgba(255,255,255,0.70)' : '#9A96B0' }}
+                  >
+                    {pkg.target}
+                  </p>
+
+                  {/* Price */}
+                  <div className="mb-5">
+                    <p
+                      className="text-3xl font-black"
+                      style={{ color: pkg.highlight ? '#fff' : '#14121F' }}
+                    >
+                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(pkg.price)}
+                    </p>
+                    <p
+                      className="text-xs mt-1"
+                      style={{ color: pkg.highlight ? 'rgba(255,255,255,0.55)' : '#B0ACCC' }}
+                    >
+                      {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(pkg.pricePerCredit)} per credit
+                    </p>
+                  </div>
+
+                  {/* Features */}
+                  <div className="flex flex-col gap-2.5 mb-7 flex-1">
+                    {[
+                      `${pkg.credits} website generation${pkg.credits > 1 ? 's' : ''}`,
+                      'AI editing gratis (tanpa batas)',
+                      'One-click deploy',
+                      'Credits tidak kadaluarsa',
+                    ].map((f) => (
+                      <div key={f} className="flex items-center gap-2.5 text-sm">
+                        <Check
+                          size={14}
+                          className="flex-shrink-0"
+                          style={{ color: pkg.highlight ? 'rgba(255,255,255,0.85)' : '#10B981' }}
+                        />
+                        <span style={{ color: pkg.highlight ? 'rgba(255,255,255,0.85)' : '#4A4660' }}>
+                          {f}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* CTA */}
+                  <motion.button
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => openTopUp(pkg)}
+                    className="w-full py-3.5 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 transition-all"
+                    style={{
+                      background: pkg.highlight ? '#fff' : 'linear-gradient(135deg, #7C3AED, #F97316)',
+                      color: pkg.highlight ? '#7C3AED' : '#fff',
+                      boxShadow: pkg.highlight
+                        ? '0 4px 16px rgba(0,0,0,0.15)'
+                        : '0 4px 16px rgba(124,58,237,0.25)',
+                    }}
+                  >
+                    <Zap size={14} fill={pkg.highlight ? '#7C3AED' : '#fff'} />
+                    Beli Paket {pkg.name}
+                  </motion.button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Bottom note */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="text-center text-sm mt-8"
+            style={{ color: '#9A96B0' }}
+          >
+            Butuh lebih banyak credits?{' '}
+            <button
+              onClick={() => openTopUp()}
+              className="font-semibold hover:underline"
+              style={{ color: '#7C3AED' }}
+            >
+              Hubungi kami
+            </button>{' '}
+            untuk paket custom.
+          </motion.p>
         </div>
       </section>
 
@@ -766,6 +905,13 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* ── TopUp Modal ────────────────────────────────────────── */}
+      <TopUpModal
+        open={topUpOpen}
+        onClose={() => { setTopUpOpen(false); setTopUpPackage(null); }}
+        preselectedPackage={topUpPackage}
+      />
 
       {/* ── Auth Modal ─────────────────────────────────────────── */}
       <AnimatePresence>

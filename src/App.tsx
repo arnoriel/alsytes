@@ -8,12 +8,16 @@ import ViewPage from './pages/view';
 import PageResolver from './pages/PageResolver';
 import LoginPage from './pages/LoginPage';
 import AuthCallback from './pages/AuthCallback';
+import SuperAdmin from './pages/SuperAdmin';
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
+          {/* ── Superadmin (no auth required) ────────────────── */}
+          <Route path="/management/superadmin" element={<SuperAdmin />} />
+
           {/* ── Public routes ──────────────────────────────── */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
