@@ -332,7 +332,7 @@ export default function PreviewPage() {
   const handleDeploy = async () => {
     if (!pageSlug || !website) return;
     await storage.update(website.id, { page_name: pageSlug, deployed_at: new Date().toISOString() });
-    const url = `${window.location.origin}/page/${pageSlug}`;
+    const url = `https://${pageSlug}.alsytes.dev`;
     setDeployedUrl(url);
     setDeploySuccess(true);
   };
@@ -345,7 +345,7 @@ export default function PreviewPage() {
 
   const goToDeployed = () => {
     if (!website || !pageSlug) return;
-    navigate(`/page/${pageSlug}`);
+    window.open(`https://${pageSlug}.alsytes.dev`, '_blank');
   };
 
   if (notFound) {
@@ -891,10 +891,11 @@ export default function PreviewPage() {
                     <div className="mb-5 px-3.5 py-3 rounded-xl bg-base-100 border border-surface-border">
                       <p className="text-xs text-text-muted mb-1 font-medium">Preview URL</p>
                       <p className="text-xs font-mono text-text-primary break-all leading-relaxed">
-                        <span className="text-text-muted">{window.location.origin}/page/</span>
+                        <span className="text-text-muted">https://</span>
                         <span className={pageSlug ? 'text-accent-glow font-semibold' : 'text-text-muted/40'}>
                           {pageSlug || 'your-page-name'}
                         </span>
+                        <span className="text-text-muted">.alsytes.dev</span>
                       </p>
                     </div>
                     <button
