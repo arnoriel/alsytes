@@ -50,7 +50,7 @@ export default function ViewPage() {
 
   const getShareableUrl = () => {
     if (!website?.page_name) return null;
-    return `${window.location.origin}/page/${website.page_name}`;
+    return `https://${website.page_name}.alsytes.dev`;
   };
 
   const openStandalone = () => {
