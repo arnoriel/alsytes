@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ArrowRight, Sparkles, Globe, Gamepad2, Wrench,
+  ArrowRight, Sparkles, Globe, Gamepad2, LayoutDashboard, Wrench,
   Zap, Shield, Star, LogIn, Check,
   Loader2, X, Code2, Palette, Rocket, Brain
 } from 'lucide-react';
@@ -113,6 +113,7 @@ export default function LandingPage() {
   const WEBSITE_TYPES = [
     { icon: Globe, label: 'Landing Pages', desc: 'Marketing & company sites', color: 'text-violet-600 bg-violet-50 border-violet-100' },
     { icon: Gamepad2, label: 'Games', desc: 'Arcade, puzzle, quiz, platformer', color: 'text-orange-600 bg-orange-50 border-orange-100' },
+    { icon: LayoutDashboard, label: 'Blogs & Articles', desc: 'Personal blogs, news articles', color: 'text-blue-600 bg-blue-50 border-blue-100' },
     { icon: Wrench, label: 'Tools & Utils', desc: 'Calculator, converter, gen', color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
   ];
 
