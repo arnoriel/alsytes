@@ -697,6 +697,81 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── How to Use It (YouTube) ────────────────────────────── */}
+      <section className="py-20 px-4 sm:px-6" style={{ background: '#fff' }}>
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-10"
+          >
+            <span
+              className="inline-block px-3 py-1.5 rounded-full text-xs font-semibold mb-4"
+              style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.20)', color: '#7C3AED' }}
+            >
+              Watch & Learn
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-800 mb-3" style={{ fontWeight: 800 }}>
+              How to Use{' '}
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #7C3AED, #F97316)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                Alsytes
+              </span>
+            </h2>
+            <p className="text-base max-w-xl mx-auto" style={{ color: '#4A4660' }}>
+              Watch how easy it is to go from idea to a fully published website — in under a minute.
+            </p>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55 }}
+            className="relative rounded-3xl overflow-hidden"
+            style={{
+              boxShadow: '0 24px 80px rgba(124,58,237,0.18), 0 4px 20px rgba(0,0,0,0.08)',
+              border: '1.5px solid rgba(124,58,237,0.18)',
+              background: '#0d0b22',
+            }}
+          >
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                width: 300, height: 300, borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%)',
+                top: '-80px', left: '-80px', filter: 'blur(50px)',
+              }}
+            />
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                width: 300, height: 300, borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(249,115,22,0.20) 0%, transparent 70%)',
+                bottom: '-80px', right: '-80px', filter: 'blur(50px)',
+              }}
+            />
+            <div className="relative" style={{ paddingTop: '56.25%' }}>
+              <iframe
+                className="absolute inset-0 w-full h-full"
+                src="https://www.youtube.com/embed/63-9LM_yDyc?rel=0&modestbranding=1&color=white"
+                title="How to Use Alsytes"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── Website Types ──────────────────────────────────────── */}
       <section id="examples" className="py-20 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
@@ -857,6 +932,176 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Additional Services ────────────────────────────────── */}
+      <section className="py-20 px-4 sm:px-6" style={{ background: '#fff' }}>
+        <div className="max-w-5xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <span
+              className="inline-block px-3 py-1.5 rounded-full text-xs font-semibold mb-4"
+              style={{ background: 'rgba(16,185,129,0.10)', border: '1px solid rgba(16,185,129,0.25)', color: '#10B981' }}
+            >
+              Additional Services
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-800 mb-4" style={{ fontWeight: 800 }}>
+              Go further with{' '}
+              <span
+                style={{
+                  background: 'linear-gradient(135deg, #10B981, #3B82F6)',
+                  backgroundClip: 'text',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
+                expert support.
+              </span>
+            </h2>
+            <p className="text-base max-w-xl mx-auto" style={{ color: '#4A4660' }}>
+              Beyond generation — we help you get your website properly online with a real domain and
+              search visibility. Fast turnaround, personal service.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Domain Registration */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0 }}
+              className="relative rounded-3xl overflow-hidden p-8 flex flex-col"
+              style={{
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                border: '1.5px solid rgba(59,130,246,0.25)',
+                boxShadow: '0 12px 40px rgba(59,130,246,0.12)',
+              }}
+            >
+              <div
+                className="absolute top-0 right-0 pointer-events-none"
+                style={{
+                  width: 220, height: 220, borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(59,130,246,0.20) 0%, transparent 70%)',
+                  transform: 'translate(40%, -40%)',
+                  filter: 'blur(40px)',
+                }}
+              />
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 text-xl"
+                style={{ background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.30)' }}
+              >
+                🌐
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">Custom Domain</h3>
+              <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,0.60)', lineHeight: 1.7 }}>
+                Want your website at <span style={{ color: '#93C5FD' }}>yourname.com</span>,{' '}
+                <span style={{ color: '#93C5FD' }}>yourname.id</span>, or{' '}
+                <span style={{ color: '#93C5FD' }}>yourname.app</span>? Just tell us the name you have
+                in mind — we'll handle the registration and connect it to your Alsytes site quickly.
+                Pricing discussed on a per-project basis.
+              </p>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {['.com', '.id', '.app', '.net', '.co', 'and more…'].map((ext) => (
+                  <span
+                    key={ext}
+                    className="px-3 py-1 rounded-full text-xs font-semibold"
+                    style={{ background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.28)', color: '#93C5FD' }}
+                  >
+                    {ext}
+                  </span>
+                ))}
+              </div>
+              
+               <a href="mailto:cobamulai.ai@gmail.com?subject=Domain%20Request%20-%20Alsytes&body=Hi%2C%20I%27d%20like%20to%20register%20a%20domain%3A%0A%0ADomain%20name%3A%20%5Byour%20domain%20here%5D%0AExtension%3A%20.com%20%2F%20.id%20%2F%20.app%20%2F%20other%0A%0AAny%20additional%20info%3A"
+                className="mt-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-all hover:scale-[1.03] active:scale-[0.97]"
+                style={{ background: 'linear-gradient(135deg, #3B82F6, #6366F1)', color: '#fff', boxShadow: '0 4px 16px rgba(59,130,246,0.35)' }}
+              >
+                📧 Request a Domain
+              </a>
+            </motion.div>
+
+            {/* SEO Optimization */}
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="relative rounded-3xl overflow-hidden p-8 flex flex-col"
+              style={{
+                background: 'linear-gradient(135deg, #0d1f0f 0%, #14301a 100%)',
+                border: '1.5px solid rgba(16,185,129,0.25)',
+                boxShadow: '0 12px 40px rgba(16,185,129,0.12)',
+              }}
+            >
+              <div
+                className="absolute top-0 right-0 pointer-events-none"
+                style={{
+                  width: 220, height: 220, borderRadius: '50%',
+                  background: 'radial-gradient(circle, rgba(16,185,129,0.20) 0%, transparent 70%)',
+                  transform: 'translate(40%, -40%)',
+                  filter: 'blur(40px)',
+                }}
+              />
+              <div
+                className="w-12 h-12 rounded-2xl flex items-center justify-center mb-5 text-xl"
+                style={{ background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.30)' }}
+              >
+                🔍
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">SEO Optimization</h3>
+              <p className="text-sm mb-5" style={{ color: 'rgba(255,255,255,0.60)', lineHeight: 1.7 }}>
+                Get your website found on Google. We set up proper meta tags, structured data,
+                sitemaps, and indexing — so your site actually shows up when people search for you.
+                Done fast, alongside your domain setup. Pricing discussed on a per-project basis.
+              </p>
+              <div className="flex flex-col gap-2.5 mb-6">
+                {[
+                  'Meta tags & Open Graph setup',
+                  'Google Search Console indexing',
+                  'Structured data (JSON-LD)',
+                  'Sitemap & robots.txt',
+                ].map((item) => (
+                  <div key={item} className="flex items-center gap-2.5 text-sm" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                    <span style={{ color: '#34D399', fontSize: 14 }}>✓</span>
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <a 
+                href="mailto:cobamulai.ai@gmail.com?subject=SEO%20Optimization%20Request%20-%20Alsytes&body=Hi%2C%20I%27d%20like%20SEO%20optimization%20for%20my%20Alsytes%20website.%0A%0AMy%20website%20URL%3A%20%5Bpaste%20your%20URL%20here%5D%0ATarget%20keywords%3A%20%5Boptional%5D%0A%0AAdditional%20info%3A"
+                className="mt-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl text-sm font-bold transition-all hover:scale-[1.03] active:scale-[0.97]"
+                style={{ background: 'linear-gradient(135deg, #10B981, #059669)', color: '#fff', boxShadow: '0 4px 16px rgba(16,185,129,0.35)' }}
+              >
+                📧 Request SEO Setup
+              </a>
+            </motion.div>
+          </div>
+
+          {/* Bottom note */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-8 text-center"
+          >
+            <p className="text-sm" style={{ color: '#9A96B0' }}>
+              Both services can be bundled together.{' '}
+              < a
+                href="mailto:cobamulai.ai@gmail.com?subject=Domain%20%2B%20SEO%20Bundle%20-%20Alsytes"
+                className="font-semibold hover:underline"
+                style={{ color: '#10B981' }}
+              />
+                Email us at cobamulai.ai@gmail.com
+              {' '}
+              and we'll get back to you quickly.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ── Testimonials ──────────────────────────────────────── */}
       {/* <section className="py-20 px-4 sm:px-6" style={{ background: '#fff' }}>
         <div className="max-w-5xl mx-auto">
@@ -904,6 +1149,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section> */}
+
 
       {/* ── Pricing ──────────────────────────────────────────── */}
       <section id="pricing" className="py-20 px-4 sm:px-6">
