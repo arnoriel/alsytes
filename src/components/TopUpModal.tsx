@@ -44,7 +44,7 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
     credits: 1,
     price: 25000,
     pricePerCredit: 25000,
-    target: 'Baru mau coba-coba',
+    target: 'For thos who want to try',
     highlight: false,
   },
   {
@@ -55,7 +55,7 @@ export const CREDIT_PACKAGES: CreditPackage[] = [
     pricePerCredit: 20000,
     badge: 'Most Popular',
     badgeColor: '#7C3AED',
-    target: 'UMKM & individu aktif',
+    target: 'For UMKM and Regular users',
     highlight: true,
   },
   {

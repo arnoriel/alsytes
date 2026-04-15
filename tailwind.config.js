@@ -4,6 +4,9 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      screens: {
+        xs: '390px',
+      },
       fontFamily: {
         display:  ['"Plus Jakarta Sans"', 'sans-serif'],
         body:     ['"Plus Jakarta Sans"', 'sans-serif'],

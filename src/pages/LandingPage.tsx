@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowRight, Sparkles, Globe, Gamepad2, LayoutDashboard, Wrench,
-  Zap, Shield, Star, LogIn, Check,
+  Zap, Shield, LogIn, Check,
   Loader2, X, Code2, Palette, Rocket, Brain
 } from 'lucide-react';
 import { useAuth } from '../components/AuthProvider';
@@ -117,15 +117,14 @@ export default function LandingPage() {
     { icon: Wrench, label: 'Tools & Utils', desc: 'Calculator, converter, gen', color: 'text-emerald-600 bg-emerald-50 border-emerald-100' },
   ];
 
-  const TESTIMONIALS = [
-    { name: 'Rani Dewi', role: 'Startup Founder', text: 'Alsytes helped me build my company landing page in 30 seconds. I was blown away.', avatar: 'RD' },
-    { name: 'Budi Santoso', role: 'Freelance Designer', text: 'I use Alsytes to prototype ideas for clients. The output quality is honestly incredible.', avatar: 'BS' },
-    { name: 'Siti Rahma', role: 'Product Manager', text: 'Created a working kanban board for my team without writing a single line of code.', avatar: 'SR' },
-  ];
+  // const TESTIMONIALS = [
+  //   { name: 'Rani Dewi', role: 'Startup Founder', text: 'Alsytes helped me build my company landing page in 30 seconds. I was blown away.', avatar: 'RD' },
+  //   { name: 'Budi Santoso', role: 'Freelance Designer', text: 'I use Alsytes to prototype ideas for clients. The output quality is honestly incredible.', avatar: 'BS' },
+  //   { name: 'Siti Rahma', role: 'Product Manager', text: 'Created a working kanban board for my team without writing a single line of code.', avatar: 'SR' },
+  // ];
 
   const STATS = [
     { value: '50K+', label: 'Websites Created' },
-    { value: '< 30s', label: 'Average Generation' },
     { value: '4.9★', label: 'User Rating' },
     { value: '99.9%', label: 'Uptime' },
   ];
@@ -201,7 +200,7 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero Section ───────────────────────────────────────── */}
-      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-16">
+      <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-16 px-4">
         {/* Animated gradient background */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Base gradient */}
@@ -212,33 +211,67 @@ export default function LandingPage() {
             }}
           />
           {/* Animated orbs */}
-          <div
-            className="absolute animate-orb-1"
+          <motion.div
+            animate={{
+              x: [0, 60, -40, 0],
+              y: [0, -80, 40, 0],
+              scale: [1, 1.15, 0.95, 1],
+            }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+            className="absolute"
+            style={{
+              width: 700, height: 700,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, rgba(124,58,237,0.25) 0%, transparent 70%)',
+              top: '-20%', left: '-15%',
+              filter: 'blur(70px)',
+            }}
+          />
+          <motion.div
+            animate={{
+              x: [0, -70, 50, 0],
+              y: [0, 60, -50, 0],
+              scale: [1, 0.9, 1.2, 1],
+            }}
+            transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut', delay: 3 }}
+            className="absolute"
             style={{
               width: 600, height: 600,
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(124,58,237,0.22) 0%, transparent 70%)',
-              top: '-15%', left: '-10%',
-              filter: 'blur(60px)',
+              background: 'radial-gradient(circle, rgba(249,115,22,0.22) 0%, transparent 70%)',
+              top: '15%', right: '-15%',
+              filter: 'blur(70px)',
             }}
           />
-          <div
-            className="absolute animate-orb-2"
+          <motion.div
+            animate={{
+              x: [0, 50, -60, 0],
+              y: [0, -50, 70, 0],
+              scale: [1, 1.2, 0.85, 1],
+            }}
+            transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut', delay: 6 }}
+            className="absolute"
             style={{
               width: 500, height: 500,
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(249,115,22,0.18) 0%, transparent 70%)',
-              top: '20%', right: '-10%',
-              filter: 'blur(60px)',
+              background: 'radial-gradient(circle, rgba(239,68,68,0.18) 0%, transparent 70%)',
+              bottom: '5%', left: '25%',
+              filter: 'blur(70px)',
             }}
           />
-          <div
-            className="absolute animate-orb-3"
+          <motion.div
+            animate={{
+              x: [0, -40, 30, 0],
+              y: [0, 40, -60, 0],
+              scale: [1, 1.1, 0.9, 1],
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut', delay: 9 }}
+            className="absolute"
             style={{
               width: 400, height: 400,
               borderRadius: '50%',
-              background: 'radial-gradient(circle, rgba(239,68,68,0.15) 0%, transparent 70%)',
-              bottom: '10%', left: '30%',
+              background: 'radial-gradient(circle, rgba(147,51,234,0.20) 0%, transparent 70%)',
+              bottom: '30%', right: '10%',
               filter: 'blur(60px)',
             }}
           />
@@ -254,14 +287,14 @@ export default function LandingPage() {
         </div>
 
         {/* Hero content */}
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
+        <div className="relative z-10 max-w-5xl mx-auto w-full text-center">
 
           {/* Big title */}
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl sm:text-6xl md:text-7xl font-800 leading-tight mb-4"
+            className="text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-800 leading-tight mb-4"
             style={{ fontWeight: 800 }}
           >
             <span
@@ -279,7 +312,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-lg sm:text-xl md:text-2xl font-medium mb-2"
+            className="text-base sm:text-xl md:text-2xl lg:text-3xl font-medium mb-2"
             style={{ color: '#4A4660' }}
           >
             Describe it. Watch it come alive.
@@ -288,7 +321,7 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-base mb-10"
+            className="text-sm sm:text-base md:text-lg mb-10"
             style={{ color: '#9A96B0' }}
           >
             Build stunning websites, games, apps, and tools with a single prompt.
@@ -299,7 +332,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 20, scale: 0.97 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.55, delay: 0.35 }}
-            className="max-w-2xl mx-auto"
+            className="max-w-2xl md:max-w-3xl mx-auto"
           >
             <div
               className="relative flex items-center rounded-2xl overflow-hidden"
@@ -309,8 +342,8 @@ export default function LandingPage() {
                 boxShadow: '0 8px 40px rgba(124,58,237,0.15), 0 2px 8px rgba(0,0,0,0.06)',
               }}
             >
-              <div className="flex-1 flex items-center px-5 py-4">
-                <Sparkles size={18} style={{ color: '#7C3AED', flexShrink: 0, marginRight: 12 }} />
+              <div className="flex-1 flex items-center px-3 sm:px-5 md:px-6 py-3 sm:py-4 md:py-5">
+                <Sparkles size={16} style={{ color: '#7C3AED', flexShrink: 0, marginRight: 8 }} />
                 <input
                   ref={inputRef}
                   type="text"
@@ -318,13 +351,13 @@ export default function LandingPage() {
                   onChange={(e) => setPrompt(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="What Website you want to Create today?"
-                  className="flex-1 bg-transparent outline-none text-base font-medium"
+                  className="flex-1 bg-transparent outline-none text-sm sm:text-base md:text-lg font-medium"
                   style={{ color: '#14121F', fontFamily: 'Plus Jakarta Sans, sans-serif' }}
                 />
               </div>
               <button
                 onClick={handleContinue}
-                className="m-2 flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white transition-all hover:scale-105 active:scale-95"
+                className="m-1.5 sm:m-2 flex items-center gap-1.5 px-3 sm:px-5 md:px-6 py-2.5 sm:py-3 md:py-3.5 rounded-xl text-xs sm:text-sm md:text-base font-semibold text-white transition-all hover:scale-105 active:scale-95"
                 style={{
                   background: prompt.trim()
                     ? 'linear-gradient(135deg, #7C3AED, #F97316)'
@@ -333,36 +366,277 @@ export default function LandingPage() {
                   transition: 'all 0.2s ease',
                 }}
               >
-                Continue <ArrowRight size={15} />
+                <span className="hidden xs:inline">Continue</span>
+                <ArrowRight size={14} />
               </button>
             </div>
 
             {/* Suggestions */}
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-4">
+            {/* Preview Cards */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="text-xs font-semibold text-center mt-8 mb-4 tracking-widest uppercase"
+              style={{ color: '#000000', letterSpacing: '0.1em' }}
+            >
+              Templates
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.55 }}
+              className="grid grid-cols-2 sm:grid-cols-4 gap-3"
+            >
               {[
-                'Landing page startup fintech',
-                'Game Snake modern',
-                'Portofolio fotografer',
-                'Todo app minimalis',
-              ].map((s) => (
+                {
+                  label: 'Startup Landing Page',
+                  prompt: 'Landing page startup for company',
+                  desc: 'Landing Page · Company',
+                  badge: 'Landing',
+                  badgeStyle: { background: 'rgba(124,58,237,0.85)', color: '#fff' },
+                  preview: (
+                    <div className="w-full h-full" style={{ background: 'linear-gradient(145deg, #0d0b22 0%, #1e1456 50%, #0d0b22 100%)', padding: '12px' }}>
+                      {/* Nav */}
+                      <div className="flex items-center gap-1 mb-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#7C3AED' }} />
+                        <div className="h-1 rounded w-5 ml-1" style={{ background: 'rgba(255,255,255,0.4)' }} />
+                        <div className="flex gap-1 ml-auto">
+                          {[14,14,14].map((w, i) => <div key={i} className="h-1 rounded" style={{ width: w, background: 'rgba(255,255,255,0.18)' }} />)}
+                        </div>
+                      </div>
+                      {/* Hero */}
+                      <div className="mb-2.5">
+                        <div className="h-1.5 rounded w-10 mb-1.5" style={{ background: 'rgba(124,58,237,0.55)' }} />
+                        <div className="h-2.5 rounded w-20 mb-1" style={{ background: '#fff' }} />
+                        <div className="h-2.5 rounded w-14 mb-1.5" style={{ background: 'linear-gradient(90deg, #7C3AED, #C026D3)' }} />
+                        <div className="h-1 rounded w-16 mb-1" style={{ background: 'rgba(255,255,255,0.18)' }} />
+                        <div className="h-1 rounded w-12 mb-2.5" style={{ background: 'rgba(255,255,255,0.10)' }} />
+                        <div className="flex gap-1.5">
+                          <div className="h-2.5 rounded-md w-9" style={{ background: 'linear-gradient(90deg, #7C3AED, #F97316)' }} />
+                          <div className="h-2.5 rounded-md w-7" style={{ border: '1px solid rgba(255,255,255,0.28)' }} />
+                        </div>
+                      </div>
+                      {/* Feature cards */}
+                      <div className="grid grid-cols-3 gap-1">
+                        {[
+                          'linear-gradient(135deg,#7C3AED,#C026D3)',
+                          'linear-gradient(135deg,#F97316,#EF4444)',
+                          'linear-gradient(135deg,#10B981,#3B82F6)',
+                        ].map((g, i) => (
+                          <div key={i} className="rounded p-1" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                            <div className="w-2 h-2 rounded mb-1" style={{ background: g }} />
+                            <div className="h-1 rounded w-full mb-1" style={{ background: 'rgba(255,255,255,0.2)' }} />
+                            <div className="h-0.5 rounded w-3/4" style={{ background: 'rgba(255,255,255,0.1)' }} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  label: 'Snake Game Modern',
+                  prompt: 'Game Snake modern',
+                  desc: 'Game · Arcade',
+                  badge: 'Game',
+                  badgeStyle: { background: 'rgba(0,25,12,0.88)', color: '#00FF88', border: '1px solid rgba(0,255,136,0.3)' },
+                  preview: (() => {
+                    const snakeCells = [13, 14, 15, 16, 17, 25, 34, 43];
+                    const headCell = 13;
+                    const foodCell = 38;
+                    return (
+                      <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: '#050505', padding: '12px', gap: '4px' }}>
+                        <p className="font-black tracking-widest" style={{ fontSize: 8, color: '#00FF88', textShadow: '0 0 8px rgba(0,255,136,0.7)', letterSpacing: '0.25em' }}>SNAKE</p>
+                        <p style={{ fontSize: 7, color: 'rgba(0,255,136,0.45)', letterSpacing: '0.1em', marginBottom: 4 }}>SCORE: 240</p>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(9, 1fr)', gap: '1.5px', width: 76 }}>
+                          {Array.from({ length: 63 }).map((_, i) => (
+                            <div key={i} style={{
+                              width: 7, height: 7,
+                              borderRadius: i === headCell ? 2 : i === foodCell ? '50%' : 1.5,
+                              background: i === headCell
+                                ? '#00FFB3'
+                                : snakeCells.includes(i)
+                                  ? '#00FF88'
+                                  : i === foodCell
+                                    ? '#FF3366'
+                                    : 'rgba(255,255,255,0.03)',
+                              boxShadow: i === headCell
+                                ? '0 0 6px rgba(0,255,180,1)'
+                                : snakeCells.includes(i)
+                                  ? '0 0 4px rgba(0,255,136,0.7)'
+                                  : i === foodCell
+                                    ? '0 0 5px rgba(255,51,102,0.9)'
+                                    : 'none',
+                            }} />
+                          ))}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, marginTop: 4 }}>
+                          {[['▲'], ['◄', '·', '►'], ['▼']].map((row, ri) => (
+                            <div key={ri} style={{ display: 'flex', gap: 2 }}>
+                              {row.map((k, ki) => (
+                                <div key={ki} style={{
+                                  width: 13, height: 13, borderRadius: 3, fontSize: 6, fontWeight: 700,
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                  background: k === '·' ? 'rgba(0,255,136,0.2)' : 'rgba(0,255,136,0.1)',
+                                  border: '1px solid rgba(0,255,136,0.28)',
+                                  color: '#00FF88',
+                                }}>{k}</div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })(),
+                },
+                {
+                  label: 'Professional Portfolio',
+                  prompt: 'Modern professional portfolio page with hero, about, featured work, and contact section',
+                  desc: 'Portfolio · Professional',
+                  badge: 'Portfolio',
+                  badgeStyle: { background: 'rgba(0,0,0,0.72)', color: 'rgba(255,255,255,0.85)', border: '1px solid rgba(255,255,255,0.12)' },
+                  preview: (
+                    <div className="w-full h-full" style={{ background: '#0F0F13', padding: '10px', fontFamily: 'sans-serif' }}>
+                      {/* Nav */}
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-1">
+                          <div className="rounded-sm" style={{ width: 8, height: 8, background: 'linear-gradient(135deg, #6EE7B7, #3B82F6)' }} />
+                          <div className="h-1 rounded" style={{ width: 22, background: 'rgba(255,255,255,0.5)' }} />
+                        </div>
+                        <div className="flex gap-1.5">
+                          {[10, 14, 10].map((w, i) => <div key={i} className="h-0.5 rounded" style={{ width: w, background: 'rgba(255,255,255,0.2)' }} />)}
+                        </div>
+                      </div>
+                      {/* Hero */}
+                      <div className="mb-3" style={{ borderLeft: '2px solid #6EE7B7', paddingLeft: 6 }}>
+                        <div className="h-1 rounded mb-1" style={{ width: 30, background: 'rgba(110,231,183,0.5)' }} />
+                        <div className="h-2 rounded mb-1" style={{ width: 60, background: '#fff' }} />
+                        <div className="h-1 rounded mb-1" style={{ width: 50, background: 'rgba(255,255,255,0.3)' }} />
+                        <div className="flex gap-1 mt-1.5">
+                          <div className="h-2 rounded" style={{ width: 22, background: 'linear-gradient(90deg, #6EE7B7, #3B82F6)' }} />
+                          <div className="h-2 rounded" style={{ width: 18, border: '1px solid rgba(255,255,255,0.2)', background: 'transparent' }} />
+                        </div>
+                      </div>
+                      {/* Work grid */}
+                      <div className="mb-2">
+                        <div className="h-0.5 rounded mb-1.5" style={{ width: 16, background: '#6EE7B7' }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 3 }}>
+                          {[
+                            { h: 32, g: 'linear-gradient(135deg,#1E293B,#334155)', accent: '#6EE7B7' },
+                            { h: 22, g: 'linear-gradient(135deg,#1a1a2e,#16213e)', accent: '#3B82F6' },
+                            { h: 22, g: 'linear-gradient(135deg,#1a1a2e,#0f3460)', accent: '#818CF8' },
+                            { h: 32, g: 'linear-gradient(135deg,#1c1c1c,#2d2d2d)', accent: '#F59E0B' },
+                          ].map((item, i) => (
+                            <div key={i} className="rounded" style={{ height: item.h, background: item.g, position: 'relative', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.06)' }}>
+                              <div style={{ position: 'absolute', bottom: 3, left: 4, right: 4, height: 2, borderRadius: 2, background: item.accent, opacity: 0.7 }} />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                      {/* Skills row */}
+                      <div className="flex gap-1">
+                        {['UX', 'Dev', 'Brand'].map((s, i) => (
+                          <div key={i} className="rounded-full" style={{ padding: '1.5px 5px', background: 'rgba(110,231,183,0.1)', border: '1px solid rgba(110,231,183,0.25)' }}>
+                            <span style={{ fontSize: 6, color: '#6EE7B7', fontWeight: 600 }}>{s}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ),
+                },
+                {
+                  label: 'Blog & Article Modern',
+                  prompt: 'Blog artikel teknologi modern',
+                  desc: 'Blog · Article',
+                  badge: 'Blog',
+                  badgeStyle: { background: 'rgba(124,58,237,0.12)', color: '#7C3AED', border: '1px solid rgba(124,58,237,0.28)' },
+                  preview: (
+                    <div className="w-full h-full" style={{ background: '#FDFCFB', padding: '12px' }}>
+                      {/* Nav */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="h-1 rounded" style={{ width: 24, background: '#14121F' }} />
+                        <div className="flex gap-1">
+                          {[12,12,12].map((w, i) => <div key={i} className="h-1 rounded" style={{ width: w, background: '#D5D3DC' }} />)}
+                        </div>
+                      </div>
+                      {/* Cover image */}
+                      <div className="rounded-md mb-2" style={{ width: '100%', height: 28, background: 'linear-gradient(135deg, #EEE, #DDD)', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(249,115,22,0.14))' }} />
+                      </div>
+                      {/* Tag */}
+                      <div className="rounded-full mb-1.5" style={{ display: 'inline-block', width: 24, height: 5, background: 'rgba(124,58,237,0.22)' }} />
+                      {/* Headline */}
+                      <div className="h-1.5 rounded mb-1" style={{ width: '90%', background: '#14121F' }} />
+                      <div className="h-1.5 rounded mb-2" style={{ width: '65%', background: '#14121F' }} />
+                      {/* Author meta */}
+                      <div className="flex items-center gap-1 mb-2">
+                        <div className="rounded-full" style={{ width: 9, height: 9, background: 'linear-gradient(135deg,#7C3AED,#F97316)' }} />
+                        <div className="h-1 rounded" style={{ width: 20, background: '#C0BECC' }} />
+                        <div className="rounded-full" style={{ width: 2, height: 2, background: '#D0CEDC' }} />
+                        <div className="h-1 rounded" style={{ width: 14, background: '#D5D3DC' }} />
+                      </div>
+                      {/* Body lines */}
+                      <div className="flex flex-col gap-1">
+                        {[100, 92, 97, 70].map((w, i) => (
+                          <div key={i} className="h-1 rounded" style={{ width: `${w}%`, background: '#E8E6EF' }} />
+                        ))}
+                      </div>
+                    </div>
+                  ),
+                },
+              ].map((card) => (
                 <button
-                  key={s}
-                  onClick={() => setPrompt(s)}
-                  className="px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-105"
+                  key={card.label}
+                  onClick={() => setPrompt(card.prompt)}
+                  className="group rounded-2xl overflow-hidden text-left"
                   style={{
-                    background: 'rgba(124,58,237,0.07)',
-                    border: '1px solid rgba(124,58,237,0.18)',
-                    color: '#7C3AED',
+                    background: '#fff',
+                    border: prompt === card.prompt ? '1.5px solid rgba(124,58,237,0.65)' : '1.5px solid rgba(226,223,239,0.9)',
+                    boxShadow: prompt === card.prompt
+                      ? '0 10px 32px rgba(124,58,237,0.20)'
+                      : '0 2px 12px rgba(60,40,120,0.07)',
+                    transition: 'all 0.22s ease',
+                    transform: prompt === card.prompt ? 'translateY(-3px) scale(1.01)' : 'none',
+                  }}
+                  onMouseEnter={e => {
+                    if (prompt !== card.prompt) {
+                      (e.currentTarget as HTMLButtonElement).style.transform = 'translateY(-4px) scale(1.02)';
+                      (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 14px 36px rgba(124,58,237,0.16)';
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(124,58,237,0.4)';
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (prompt !== card.prompt) {
+                      (e.currentTarget as HTMLButtonElement).style.transform = 'none';
+                      (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 2px 12px rgba(60,40,120,0.07)';
+                      (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(226,223,239,0.9)';
+                    }
                   }}
                 >
-                  {s}
+                  {/* Preview area */}
+                  <div className="overflow-hidden relative" style={{ height: 118 }}>
+                    {card.preview}
+                    {/* Badge */}
+                    <span
+                      className="absolute top-2 right-2 text-[9px] font-bold px-2 py-0.5 rounded-full"
+                      style={{ letterSpacing: '0.04em', backdropFilter: 'blur(6px)', ...card.badgeStyle }}
+                    >
+                      {card.badge}
+                    </span>
+                  </div>
+                  {/* Info */}
+                  <div className="px-3 py-2.5">
+                    <p className="font-semibold mb-0.5" style={{ fontSize: 10, color: '#9A96B0', letterSpacing: '0.03em' }}>{card.desc}</p>
+                    <p className="font-bold leading-snug" style={{ fontSize: 11.5, fontWeight: 700, color: '#14121F' }}>{card.label}</p>
+                  </div>
                 </button>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* Social proof */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.7 }}
@@ -387,32 +661,14 @@ export default function LandingPage() {
               </div>
               <p className="text-xs" style={{ color: '#9A96B0' }}>Trusted by 50,000+ creators</p>
             </div>
-          </motion.div>
+          </motion.div> */}
         </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <p className="text-xs font-medium" style={{ color: '#9A96B0' }}>Discover more</p>
-          <motion.div
-            animate={{ y: [0, 6, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-5 h-8 rounded-full border-2 flex items-start justify-center pt-1.5"
-            style={{ borderColor: '#E2DFEF' }}
-          >
-            <div className="w-1 h-2 rounded-full" style={{ background: '#9A96B0' }} />
-          </motion.div>
-        </motion.div>
       </section>
 
       {/* ── Stats Section ──────────────────────────────────────── */}
       <section className="py-16 border-y" style={{ background: '#fff', borderColor: '#E2DFEF' }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
             {STATS.map((stat, i) => (
               <motion.div
                 key={stat.label}
@@ -592,7 +848,7 @@ export default function LandingPage() {
                   <div className={`w-11 h-11 rounded-xl flex items-center justify-center border mb-4 ${f.color}`}>
                     <Icon size={18} />
                   </div>
-                  <h3 className="text-base font-700 mb-2" style={{ fontWeight: 700 }}>{f.title}</h3>
+                  <h3 className="text-base text-gray-800 font-700 mb-2" style={{ fontWeight: 700 }}>{f.title}</h3>
                   <p className="text-sm leading-relaxed" style={{ color: '#4A4660' }}>{f.desc}</p>
                 </motion.div>
               );
@@ -602,7 +858,7 @@ export default function LandingPage() {
       </section>
 
       {/* ── Testimonials ──────────────────────────────────────── */}
-      <section className="py-20 px-4 sm:px-6" style={{ background: '#fff' }}>
+      {/* <section className="py-20 px-4 sm:px-6" style={{ background: '#fff' }}>
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -647,7 +903,7 @@ export default function LandingPage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ── Pricing ──────────────────────────────────────────── */}
       <section id="pricing" className="py-20 px-4 sm:px-6">
@@ -665,10 +921,10 @@ export default function LandingPage() {
               Pricing
             </span>
             <h2 className="text-3xl sm:text-4xl font-800 mb-3" style={{ fontWeight: 800 }}>
-              Bayar sesuai yang kamu butuhkan
+              Pay for what you need
             </h2>
             <p className="text-base mb-10" style={{ color: '#9A96B0' }}>
-              Mulai gratis 3 credits setiap bulan. Top up kapan saja, tanpa langganan.
+              Start free with 3 credits every month. Top up anytime, no subscription required.
             </p>
           </motion.div>
 
@@ -688,7 +944,7 @@ export default function LandingPage() {
               }}
             >
               <Sparkles size={14} />
-              Semua user dapat <strong>3 Credits GRATIS</strong> setiap bulan — otomatis reset tiap tanggal 1
+              All users get <strong>3 FREE Credits</strong> every month — automatically resets on the 1st
             </div>
           </motion.div>
 
@@ -718,7 +974,7 @@ export default function LandingPage() {
                     className="absolute top-4 right-4 px-2.5 py-1 rounded-full text-[10px] font-bold"
                     style={{
                       background: pkg.highlight ? 'rgba(255,255,255,0.22)' : pkg.badgeColor,
-                      color: pkg.highlight ? '#fff' : '#fff',
+                      color: '#fff',
                     }}
                   >
                     {pkg.badge}
@@ -782,9 +1038,9 @@ export default function LandingPage() {
                   <div className="flex flex-col gap-2.5 mb-7 flex-1">
                     {[
                       `${pkg.credits} website generation${pkg.credits > 1 ? 's' : ''}`,
-                      'AI editing gratis (tanpa batas)',
+                      'Unlimited free AI editing',
                       'One-click deploy',
-                      'Credits tidak kadaluarsa',
+                      'Credits never expire',
                     ].map((f) => (
                       <div key={f} className="flex items-center gap-2.5 text-sm">
                         <Check
@@ -814,7 +1070,7 @@ export default function LandingPage() {
                     }}
                   >
                     <Zap size={14} fill={pkg.highlight ? '#7C3AED' : '#fff'} />
-                    Beli Paket {pkg.name}
+                    Get {pkg.name} Plan
                   </motion.button>
                 </div>
               </motion.div>
@@ -829,15 +1085,15 @@ export default function LandingPage() {
             className="text-center text-sm mt-8"
             style={{ color: '#9A96B0' }}
           >
-            Butuh lebih banyak credits?{' '}
+            Need more credits?{' '}
             <button
               onClick={() => openTopUp()}
               className="font-semibold hover:underline"
               style={{ color: '#7C3AED' }}
             >
-              Hubungi kami
+              Contact us
             </button>{' '}
-            untuk paket custom.
+            for a custom plan.
           </motion.p>
         </div>
       </section>
