@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogOut, ChevronUp, User, Mail, Shield } from 'lucide-react';
+import { LogOut, ChevronUp, User, Mail, Shield, Globe, Check } from 'lucide-react';
 import { useAuth } from './AuthProvider';
 import { signOut } from '../lib/supabase';
+import { useLanguage } from './LanguageProvider';
+import type { Language } from '../lib/i18n';
 
 interface UserMenuProps {
   collapsed?: boolean;
@@ -10,13 +12,18 @@ interface UserMenuProps {
 
 export default function UserMenu({ collapsed = false }: UserMenuProps) {
   const { user } = useAuth();
+  const { t, language, setLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [showLangPanel, setShowLangPanel] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+        setShowLangPanel(false);
+      }
     };
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
@@ -50,11 +57,30 @@ export default function UserMenu({ collapsed = false }: UserMenuProps) {
     );
   };
 
+  const DropdownContent = () => (
+    <>
+      {showLangPanel ? (
+        <LangPanel
+          language={language}
+          setLanguage={(l) => { setLanguage(l); setShowLangPanel(false); }}
+          onBack={() => setShowLangPanel(false)}
+          t={t}
+        />
+      ) : (
+        <>
+          <ProfileCard {...{ name, email, initials, avatarUrl, provider, Avatar }} t={t} />
+          <LanguageButton t={t} onClick={() => setShowLangPanel(true)} language={language} />
+          <LogoutButton loggingOut={loggingOut} onLogout={handleLogout} t={t} />
+        </>
+      )}
+    </>
+  );
+
   if (collapsed) {
     return (
       <div ref={ref} className="relative flex items-center justify-center">
         <button
-          onClick={() => setOpen((o) => !o)}
+          onClick={() => { setOpen((o) => !o); setShowLangPanel(false); }}
           title={name}
           className="transition-all hover:scale-110"
         >
@@ -71,8 +97,7 @@ export default function UserMenu({ collapsed = false }: UserMenuProps) {
               className="absolute bottom-0 left-full ml-2 w-56 rounded-2xl overflow-hidden z-50"
               style={{ background: '#fff', border: '1px solid #E2DFEF', boxShadow: '0 8px 32px rgba(60,40,120,0.15)' }}
             >
-              <ProfileCard {...{ name, email, initials, avatarUrl, provider, Avatar }} />
-              <LogoutButton loggingOut={loggingOut} onLogout={handleLogout} />
+              <DropdownContent />
             </motion.div>
           )}
         </AnimatePresence>
@@ -83,7 +108,7 @@ export default function UserMenu({ collapsed = false }: UserMenuProps) {
   return (
     <div ref={ref} className="relative">
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => { setOpen((o) => !o); setShowLangPanel(false); }}
         className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-xl transition-all"
         style={{ background: open ? '#F8F7FF' : 'transparent' }}
         onMouseEnter={(e) => { if (!open) e.currentTarget.style.background = '#F8F7FF'; }}
@@ -110,8 +135,7 @@ export default function UserMenu({ collapsed = false }: UserMenuProps) {
             className="absolute bottom-full left-0 right-0 mb-2 rounded-2xl overflow-hidden z-50"
             style={{ background: '#fff', border: '1px solid #E2DFEF', boxShadow: '0 8px 32px rgba(60,40,120,0.15)' }}
           >
-            <ProfileCard {...{ name, email, initials, avatarUrl, provider, Avatar }} />
-            <LogoutButton loggingOut={loggingOut} onLogout={handleLogout} />
+            <DropdownContent />
           </motion.div>
         )}
       </AnimatePresence>
@@ -119,9 +143,96 @@ export default function UserMenu({ collapsed = false }: UserMenuProps) {
   );
 }
 
-function ProfileCard({ name, email, provider, Avatar }: {
+// ── Language Panel ─────────────────────────────────────────────────
+function LangPanel({
+  language,
+  setLanguage,
+  onBack,
+  t,
+}: {
+  language: Language;
+  setLanguage: (l: Language) => void;
+  onBack: () => void;
+  t: ReturnType<typeof useLanguage>['t'];
+}) {
+  const options: { value: Language; flag: string; native: string; sub: string }[] = [
+    { value: 'en', flag: '🇺🇸', native: 'English', sub: t.common.english },
+    { value: 'id', flag: '🇮🇩', native: 'Indonesia', sub: t.common.indonesian },
+  ];
+
+  return (
+    <div>
+      <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: '#E2DFEF' }}>
+        <button
+          onClick={onBack}
+          className="text-lg leading-none mr-1 hover:opacity-70 transition-opacity"
+          style={{ color: '#9A96B0' }}
+        >
+          ‹
+        </button>
+        <Globe size={13} style={{ color: '#7C3AED' }} />
+        <span className="text-xs font-semibold" style={{ color: '#14121F' }}>{t.common.languageSettings}</span>
+      </div>
+      <p className="px-4 pt-3 pb-1 text-[10px]" style={{ color: '#9A96B0' }}>{t.common.selectLanguage}</p>
+      <div className="flex flex-col pb-2">
+        {options.map((opt) => (
+          <button
+            key={opt.value}
+            onClick={() => setLanguage(opt.value)}
+            className="flex items-center justify-between px-4 py-2.5 transition-colors"
+            style={{ color: language === opt.value ? '#7C3AED' : '#4A4660' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#F8F7FF'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = ''; }}
+          >
+            <div className="flex items-center gap-2.5">
+              <span className="text-base">{opt.flag}</span>
+              <div className="text-left">
+                <p className="text-xs font-semibold leading-tight">{opt.native}</p>
+                <p className="text-[10px]" style={{ color: '#9A96B0' }}>{opt.sub}</p>
+              </div>
+            </div>
+            {language === opt.value && (
+              <Check size={13} style={{ color: '#7C3AED', flexShrink: 0 }} />
+            )}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LanguageButton({
+  t,
+  onClick,
+  language,
+}: {
+  t: ReturnType<typeof useLanguage>['t'];
+  onClick: () => void;
+  language: Language;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-2.5 px-4 py-2.5 border-t transition-colors"
+      style={{ borderColor: '#E2DFEF', color: '#4A4660' }}
+      onMouseEnter={(e) => { e.currentTarget.style.background = '#F8F7FF'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.background = ''; }}
+    >
+      <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.18)' }}>
+        <Globe size={12} style={{ color: '#7C3AED' }} />
+      </div>
+      <span className="text-xs font-semibold flex-1 text-left">{t.common.language}</span>
+      <span className="text-[10px] px-1.5 py-0.5 rounded-md font-bold uppercase" style={{ background: '#F3F2FA', color: '#7C3AED' }}>
+        {language === 'en' ? 'EN' : 'ID'}
+      </span>
+    </button>
+  );
+}
+
+function ProfileCard({ name, email, provider, Avatar, t }: {
   name: string; email: string; initials: string; avatarUrl?: string; provider?: string;
   Avatar: React.ComponentType<{ size?: 'sm' | 'md' | 'lg' }>;
+  t: ReturnType<typeof useLanguage>['t'];
 }) {
   return (
     <div className="p-4 border-b" style={{ borderColor: '#E2DFEF' }}>
@@ -163,18 +274,22 @@ function ProfileCard({ name, email, provider, Avatar }: {
           style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.20)' }}
         >
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span className="text-[10px] font-semibold" style={{ color: '#10B981' }}>Online</span>
+          <span className="text-[10px] font-semibold" style={{ color: '#10B981' }}>{t.common.online}</span>
         </div>
         <div className="flex items-center gap-1 px-2 py-1 rounded-lg" style={{ background: '#F8F7FF', border: '1px solid #E2DFEF' }}>
           <User size={9} style={{ color: '#9A96B0' }} />
-          <span className="text-[10px] font-medium" style={{ color: '#9A96B0' }}>Free Plan</span>
+          <span className="text-[10px] font-medium" style={{ color: '#9A96B0' }}>{t.common.freePlan}</span>
         </div>
       </div>
     </div>
   );
 }
 
-function LogoutButton({ loggingOut, onLogout }: { loggingOut: boolean; onLogout: () => void }) {
+function LogoutButton({ loggingOut, onLogout, t }: {
+  loggingOut: boolean;
+  onLogout: () => void;
+  t: ReturnType<typeof useLanguage>['t'];
+}) {
   return (
     <button
       onClick={onLogout}
@@ -187,7 +302,7 @@ function LogoutButton({ loggingOut, onLogout }: { loggingOut: boolean; onLogout:
       <div className="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.18)' }}>
         <LogOut size={12} style={{ color: '#EF4444' }} />
       </div>
-      <span className="text-xs font-semibold">{loggingOut ? 'Signing out…' : 'Sign out'}</span>
+      <span className="text-xs font-semibold">{loggingOut ? t.common.signingOut : t.common.signOut}</span>
     </button>
   );
 }

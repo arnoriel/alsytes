@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Sparkles, Key, Wand2, ChevronDown } from 'lucide-react';
 import type { GenerationStatus } from '../types';
 import { ENV } from '../lib/env';
+import { useLanguage } from './LanguageProvider';
 
 const PROMPT_SUGGESTIONS = [
   'Landing page untuk startup fintech dengan tema gelap elegan, warna biru elektrik & emas, animasi particles di hero, fitur grid bento, dan pricing table',
@@ -26,6 +27,7 @@ interface PromptInputProps {
 }
 
 export default function PromptInput({ onSubmit, status, suggestedPrompt, onSuggestedPromptConsumed }: PromptInputProps) {
+  const { t } = useLanguage();
   const [prompt, setPrompt] = useState('');
   const [apiKey, setApiKey] = useState(
     () => ENV.apiKey ?? localStorage.getItem('alsytes_gemma_key') ?? ''
@@ -39,7 +41,6 @@ export default function PromptInput({ onSubmit, status, suggestedPrompt, onSugge
     if (apiKey) localStorage.setItem('alsytes_gemma_key', apiKey);
   }, [apiKey]);
 
-  // When a suggestion is passed from parent (idea cards), fill the prompt
   useEffect(() => {
     if (suggestedPrompt) {
       setPrompt(suggestedPrompt);
@@ -48,8 +49,8 @@ export default function PromptInput({ onSubmit, status, suggestedPrompt, onSugge
         if (textareaRef.current) {
           textareaRef.current.focus();
           const el = textareaRef.current;
-          el.style.height = "auto";
-          el.style.height = Math.min(el.scrollHeight, 200) + "px";
+          el.style.height = 'auto';
+          el.style.height = Math.min(el.scrollHeight, 200) + 'px';
         }
       }, 50);
     }
@@ -136,7 +137,7 @@ export default function PromptInput({ onSubmit, status, suggestedPrompt, onSugge
         <div className="flex items-center justify-between px-3.5 md:px-4 pt-3 pb-1.5">
           <div className="flex items-center gap-2">
             <Wand2 size={13} style={{ color: '#7C3AED' }} />
-            <span className="text-xs font-semibold" style={{ color: '#4A4660' }}>Describe your website</span>
+            <span className="text-xs font-semibold" style={{ color: '#4A4660' }}>{t.prompt.describeLabel}</span>
           </div>
           <button
             onClick={() => setShowSuggestions((s) => !s)}
@@ -148,7 +149,7 @@ export default function PromptInput({ onSubmit, status, suggestedPrompt, onSugge
             }
           >
             <Sparkles size={10} />
-            <span className="hidden sm:inline">Ideas</span>
+            <span className="hidden sm:inline">{t.prompt.ideas}</span>
             <ChevronDown size={10} style={{ transform: showSuggestions ? 'rotate(180deg)' : undefined, transition: 'transform 0.2s' }} />
           </button>
         </div>
@@ -160,7 +161,7 @@ export default function PromptInput({ onSubmit, status, suggestedPrompt, onSugge
           onChange={(e) => { setPrompt(e.target.value); autoResize(); }}
           onKeyDown={handleKeyDown}
           disabled={isGenerating}
-          placeholder="Deskripsikan apa yang mau dibikin — landing page, game, blog, tool, atau apapun..."
+          placeholder={t.prompt.placeholder}
           rows={3}
           className="w-full bg-transparent text-sm leading-relaxed px-3.5 md:px-4 py-2 resize-none outline-none disabled:opacity-50"
           style={{
@@ -175,11 +176,11 @@ export default function PromptInput({ onSubmit, status, suggestedPrompt, onSugge
         <div className="flex items-center justify-between px-3.5 md:px-4 py-2.5 border-t" style={{ borderColor: '#E2DFEF' }}>
           <div className="flex items-center gap-2">
             {prompt.length > 0 && (
-              <span className="text-xs font-mono" style={{ color: '#9A96B0' }}>{prompt.length} chars</span>
+              <span className="text-xs font-mono" style={{ color: '#9A96B0' }}>{prompt.length} {t.prompt.chars}</span>
             )}
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-xs hidden sm:block" style={{ color: '#9A96B0' }}>Ctrl+↵</span>
+            <span className="text-xs hidden sm:block" style={{ color: '#9A96B0' }}>{t.prompt.ctrlEnter}</span>
             <motion.button
               whileHover={{ scale: canSubmit ? 1.02 : 1 }}
               whileTap={{ scale: canSubmit ? 0.97 : 1 }}
@@ -204,12 +205,12 @@ export default function PromptInput({ onSubmit, status, suggestedPrompt, onSugge
               {isGenerating ? (
                 <>
                   <span className="w-3.5 h-3.5 border-2 rounded-full animate-spin" style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff' }} />
-                  <span className="hidden sm:inline">Generating…</span>
+                  <span className="hidden sm:inline">{t.prompt.generating}</span>
                 </>
               ) : (
                 <>
                   <Send size={13} />
-                  Generate
+                  {t.prompt.generate}
                 </>
               )}
             </motion.button>
@@ -225,16 +226,12 @@ export default function PromptInput({ onSubmit, status, suggestedPrompt, onSugge
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -6, scale: 0.99 }}
             className="rounded-2xl overflow-hidden"
-            style={{
-              background: '#fff',
-              border: '1px solid #E2DFEF',
-              boxShadow: '0 8px 32px rgba(60,40,120,0.10)',
-            }}
+            style={{ background: '#fff', border: '1px solid #E2DFEF', boxShadow: '0 8px 32px rgba(60,40,120,0.10)' }}
           >
             <div className="px-4 py-3 border-b flex items-center gap-2" style={{ borderColor: '#E2DFEF' }}>
               <Sparkles size={12} style={{ color: '#7C3AED' }} />
               <p className="text-xs font-700 uppercase tracking-wider" style={{ fontWeight: 700, color: '#14121F' }}>
-                Prompt Ideas
+                {t.prompt.promptIdeasTitle}
               </p>
             </div>
             <div className="flex flex-col divide-y max-h-64 overflow-y-auto" style={{ borderColor: '#E2DFEF' }}>

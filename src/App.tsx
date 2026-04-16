@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './components/AuthProvider';
+import { LanguageProvider } from './components/LanguageProvider';
 import ProtectedRoute from './components/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import Home from './pages/Home';
@@ -12,47 +13,49 @@ import SuperAdmin from './pages/SuperAdmin';
 
 export default function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* ── Superadmin (no auth required) ────────────────── */}
-          <Route path="/management/superadmin" element={<SuperAdmin />} />
+    <LanguageProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Routes>
+            {/* ── Superadmin (no auth required) ────────────────── */}
+            <Route path="/management/superadmin" element={<SuperAdmin />} />
 
-          {/* ── Public routes ──────────────────────────────── */}
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
+            {/* ── Public routes ──────────────────────────────── */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
 
-          {/* Shareable public page */}
-          <Route path="/page/:page_name" element={<PageResolver />} />
+            {/* Shareable public page */}
+            <Route path="/page/:page_name" element={<PageResolver />} />
 
-          {/* ── Protected routes ─────────────────────────── */}
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <Home />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/websites/:id/preview"
-            element={
-              <ProtectedRoute>
-                <PreviewPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/websites/:id/:page_name"
-            element={
-              <ProtectedRoute>
-                <ViewPage />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+            {/* ── Protected routes ─────────────────────────── */}
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/websites/:id/preview"
+              element={
+                <ProtectedRoute>
+                  <PreviewPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/websites/:id/:page_name"
+              element={
+                <ProtectedRoute>
+                  <ViewPage />
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
+    </LanguageProvider>
   );
 }

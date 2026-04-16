@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import type { GenerationStatus, Website } from '../types';
 import type { SummaryStatus } from '../pages/Home';
+import { useLanguage } from './LanguageProvider';
 
 interface GenerationPanelProps {
   status: GenerationStatus;
@@ -24,18 +25,6 @@ function renderMarkdown(text: string): string {
     .replace(/\n/g, '<br/>');
 }
 
-// Simulated AI process log messages shown during generation
-const PROCESS_MESSAGES = [
-  { delay: 0,    text: '🧠 Analyzing your prompt and determining website type…' },
-  { delay: 2500, text: '🎨 Designing layout, color palette, and typography…' },
-  { delay: 5000, text: '✍️ Writing HTML structure and semantic markup…' },
-  { delay: 8000, text: '💅 Applying styles, animations, and responsive design…' },
-  { delay: 12000, text: '⚙️ Adding JavaScript interactions and functionality…' },
-  { delay: 16000, text: '🖼️ Integrating images, icons, and visual assets…' },
-  { delay: 20000, text: '🔧 Optimizing code structure and cross-browser compatibility…' },
-  { delay: 25000, text: '✅ Finalizing and validating the complete HTML document…' },
-];
-
 export default function GenerationPanel({
   status,
   streamedCode,
@@ -46,13 +35,19 @@ export default function GenerationPanel({
   summaryStatus,
   userName = 'there',
 }: GenerationPanelProps) {
+  const { t } = useLanguage();
   const summaryRef = useRef<HTMLDivElement>(null);
   const [processLog, setProcessLog] = useState<string[]>([]);
   const [showLog, setShowLog] = useState(true);
   const logRef = useRef<HTMLDivElement>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  // Start process log when generation begins
+  // Use translated process messages with delays
+  const PROCESS_MESSAGES = t.generation.processMessages.map((text, i) => ({
+    delay: [0, 2500, 5000, 8000, 12000, 16000, 20000, 25000][i] ?? i * 3000,
+    text,
+  }));
+
   useEffect(() => {
     if (status === 'thinking' || status === 'streaming') {
       setProcessLog([]);
@@ -60,22 +55,21 @@ export default function GenerationPanel({
       timersRef.current = [];
 
       PROCESS_MESSAGES.forEach(({ delay, text }) => {
-        const t = setTimeout(() => {
+        const timer = setTimeout(() => {
           setProcessLog((prev) => {
-            if (prev.includes(text)) return prev;
+            if (prev.some((m) => m === text)) return prev;
             return [...prev, text];
           });
         }, delay);
-        timersRef.current.push(t);
+        timersRef.current.push(timer);
       });
     }
     if (status === 'done' || status === 'error') {
       timersRef.current.forEach(clearTimeout);
     }
     return () => timersRef.current.forEach(clearTimeout);
-  }, [status]);
+  }, [status, t]);
 
-  // Auto scroll log
   useEffect(() => {
     if (logRef.current) {
       logRef.current.scrollTop = logRef.current.scrollHeight;
@@ -93,8 +87,6 @@ export default function GenerationPanel({
   const isGenerating = status === 'thinking' || status === 'streaming';
   const isDone = status === 'done';
   const isError = status === 'error';
-
-  // Char count for display
   const charCount = streamedCode ? streamedCode.length : 0;
 
   return (
@@ -108,14 +100,12 @@ export default function GenerationPanel({
       >
         {isGenerating && (
           <>
-            {/* Header */}
             <div
               className="px-6 py-5 border-b"
               style={{ borderColor: '#E2DFEF', background: 'linear-gradient(135deg, rgba(124,58,237,0.04), rgba(249,115,22,0.03))' }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  {/* Animated logo */}
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center animate-pulse"
                     style={{ background: 'linear-gradient(135deg, #7C3AED, #F97316)' }}
@@ -124,10 +114,10 @@ export default function GenerationPanel({
                   </div>
                   <div>
                     <p className="text-base font-700" style={{ fontWeight: 700, color: '#14121F' }}>
-                      Your Website is Being Created
+                      {t.generation.beingCreated}
                     </p>
                     <p className="text-sm" style={{ color: '#9A96B0' }}>
-                      You can leave and come here later when it's finished, don't close this window on your browser ☺️
+                      {t.generation.beingCreatedDesc}
                     </p>
                   </div>
                 </div>
@@ -138,7 +128,6 @@ export default function GenerationPanel({
                 )}
               </div>
 
-              {/* Progress bar */}
               <div className="mt-4 h-1.5 rounded-full overflow-hidden" style={{ background: '#F3F2FA' }}>
                 <motion.div
                   className="h-full rounded-full"
@@ -149,13 +138,12 @@ export default function GenerationPanel({
               </div>
             </div>
 
-            {/* Process log */}
             <div className="px-6 py-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Clock size={13} style={{ color: '#9A96B0' }} />
                   <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: '#9A96B0' }}>
-                    Process Log
+                    {t.generation.processLog}
                   </span>
                 </div>
                 <button
@@ -164,7 +152,7 @@ export default function GenerationPanel({
                   style={{ color: '#9A96B0' }}
                 >
                   {showLog ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
-                  {showLog ? 'Hide' : 'Show'}
+                  {showLog ? t.generation.hide : t.generation.show}
                 </button>
               </div>
 
@@ -176,10 +164,7 @@ export default function GenerationPanel({
                     exit={{ height: 0, opacity: 0 }}
                     className="overflow-hidden"
                   >
-                    <div
-                      ref={logRef}
-                      className="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1"
-                    >
+                    <div ref={logRef} className="flex flex-col gap-2 max-h-48 overflow-y-auto pr-1">
                       {processLog.map((msg, i) => (
                         <motion.div
                           key={i}
@@ -201,17 +186,16 @@ export default function GenerationPanel({
                             className="w-3 h-3 border-2 rounded-full animate-spin flex-shrink-0"
                             style={{ borderColor: 'rgba(124,58,237,0.2)', borderTopColor: '#7C3AED' }}
                           />
-                          Initializing AI generation…
+                          {t.generation.initializingAI}
                         </div>
                       )}
-                      {/* Typing indicator */}
                       {status === 'streaming' && (
                         <div
                           className="flex items-center gap-2 text-sm py-1.5 px-3 rounded-xl"
                           style={{ background: 'rgba(124,58,237,0.06)', border: '1px solid rgba(124,58,237,0.18)' }}
                         >
                           <div className="flex gap-1">
-                            {[0,1,2].map((i) => (
+                            {[0, 1, 2].map((i) => (
                               <motion.div
                                 key={i}
                                 className="w-1.5 h-1.5 rounded-full"
@@ -221,7 +205,7 @@ export default function GenerationPanel({
                               />
                             ))}
                           </div>
-                          <span style={{ color: '#7C3AED', fontWeight: 600 }}>Writing code…</span>
+                          <span style={{ color: '#7C3AED', fontWeight: 600 }}>{t.generation.writingCode}</span>
                         </div>
                       )}
                     </div>
@@ -239,7 +223,6 @@ export default function GenerationPanel({
             animate={{ opacity: 1, scale: 1 }}
             className="px-6 py-6"
           >
-            {/* Success header */}
             <div className="flex items-center gap-3 mb-4">
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center"
@@ -249,13 +232,14 @@ export default function GenerationPanel({
               </div>
               <div>
                 <p className="text-base font-700" style={{ fontWeight: 700, color: '#14121F' }}>
-                  {userName !== 'there' ? `${userName}, your` : 'Your'} Website is Ready!
+                  {userName !== 'there'
+                    ? t.generation.websiteReady.replace('{name}', `${userName},`)
+                    : t.generation.websiteReadyGeneric}
                 </p>
-                <p className="text-sm" style={{ color: '#9A96B0' }}>Come take a look 🎉</p>
+                <p className="text-sm" style={{ color: '#9A96B0' }}>{t.generation.comeAndLook}</p>
               </div>
             </div>
 
-            {/* Website info */}
             <div
               className="p-4 rounded-xl mb-5"
               style={{ background: '#F8F7FF', border: '1px solid #E2DFEF' }}
@@ -275,12 +259,11 @@ export default function GenerationPanel({
                   style={{ background: 'linear-gradient(135deg, #7C3AED, #F97316)', boxShadow: '0 4px 16px rgba(124,58,237,0.30)' }}
                 >
                   <Eye size={14} />
-                  Open Preview
+                  {t.generation.openPreview}
                 </motion.button>
               </div>
             </div>
 
-            {/* Process log (collapsed summary) */}
             <div>
               <button
                 onClick={() => setShowLog((s) => !s)}
@@ -288,7 +271,7 @@ export default function GenerationPanel({
                 style={{ color: '#9A96B0' }}
               >
                 {showLog ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-                {showLog ? 'Hide' : 'Show'} build log
+                {showLog ? t.generation.hideBuildLog : t.generation.showBuildLog}
               </button>
               {showLog && (
                 <div className="flex flex-col gap-1.5 max-h-40 overflow-y-auto">
@@ -299,7 +282,6 @@ export default function GenerationPanel({
                       style={{ background: '#F8F7FF', border: '1px solid #E2DFEF', color: '#4A4660' }}
                     >
                       <CheckCircle2 size={11} style={{ color: '#10B981', flexShrink: 0 }} />
-                      {msg.replace(/^[^\s]+\s/, '')} {/* strip emoji */}
                       {msg}
                     </div>
                   ))}
@@ -319,7 +301,7 @@ export default function GenerationPanel({
               <AlertCircle size={18} style={{ color: '#EF4444' }} />
             </div>
             <div>
-              <p className="text-sm font-semibold" style={{ color: '#EF4444' }}>Generation Failed</p>
+              <p className="text-sm font-semibold" style={{ color: '#EF4444' }}>{t.generation.generationFailed}</p>
               <p className="text-xs mt-1" style={{ color: '#9A96B0' }}>{errorMessage}</p>
             </div>
           </div>
@@ -354,7 +336,7 @@ export default function GenerationPanel({
                 </span>
                 {summaryStatus === 'generating' && (
                   <div className="flex gap-1 ml-1">
-                    {[0,1,2].map((i) => (
+                    {[0, 1, 2].map((i) => (
                       <motion.div
                         key={i}
                         className="w-1.5 h-1.5 rounded-full"

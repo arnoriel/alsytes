@@ -15,6 +15,7 @@ import type { Website, GenerationStatus } from '../types';
 import { storage } from '../lib/storage';
 import { generateWebsite, generateWebsiteSummary, extractWebsiteName } from '../lib/ai';
 import { useAuth } from '../components/AuthProvider';
+import { useLanguage } from '../components/LanguageProvider';
 
 export type SummaryStatus = 'idle' | 'generating' | 'done';
 type HomeMode = 'select' | 'prompt' | 'form';
@@ -124,6 +125,7 @@ export default function Home() {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, credits, consumeCredit } = useAuth();
+  const { t } = useLanguage();
 
   const [creditModalOpen, setCreditModalOpen] = useState(false);
   const [websites, setWebsites] = useState<Website[]>([]);
@@ -263,10 +265,10 @@ export default function Home() {
   const userName = (user?.user_metadata?.full_name as string | undefined)?.split(' ')[0] ?? 'there';
 
   const CAPABILITIES = [
-    { icon: Globe, label: 'Landing Pages', desc: 'Marketing, portfolio, company sites', color: 'text-violet-600 bg-violet-50 border-violet-100' },
-    { icon: Gamepad2, label: 'Games', desc: 'Arcade, puzzle, quiz, platformer', color: 'text-orange-600 bg-orange-50 border-orange-100' },
-    { icon: LayoutDashboard, label: 'Blog & Articles', desc: 'News, articles, personal blog', color: 'text-blue-600 bg-blue-50 border-blue-100' },
-    { icon: Wrench, label: 'Tools', desc: 'Calculator, converter, generator', color: 'text-amber-600 bg-amber-50 border-amber-100' },
+    { icon: Globe, label: t.home.capLandingPages, desc: t.home.capLandingDesc, color: 'text-violet-600 bg-violet-50 border-violet-100' },
+    { icon: Gamepad2, label: t.home.capGames, desc: t.home.capGamesDesc, color: 'text-orange-600 bg-orange-50 border-orange-100' },
+    { icon: LayoutDashboard, label: t.home.capBlog, desc: t.home.capBlogDesc, color: 'text-blue-600 bg-blue-50 border-blue-100' },
+    { icon: Wrench, label: t.home.capTools, desc: t.home.capToolsDesc, color: 'text-amber-600 bg-amber-50 border-amber-100' },
   ];
 
   // Whether we're in the idle free-prompt centered view
@@ -327,7 +329,7 @@ export default function Home() {
               style={{ background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.20)', color: '#10B981' }}
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Powered by AI
+              {t.common.poweredByAI}
             </span>
           </div>
         </header>
@@ -353,11 +355,11 @@ export default function Home() {
                     style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.18)', color: '#7C3AED' }}
                   >
                     <Sparkles size={11} />
-                    Hey {userName}, ready to build?
+                    {t.home.heyReady.replace('{name}', userName)}
                   </div>
 
                   <h2 className="text-3xl md:text-4xl leading-tight mb-3" style={{ fontWeight: 800, color: '#14121F' }}>
-                    How do you want to{' '}
+                    {t.home.howDoYouWant}{' '}
                     <em
                       className="not-italic"
                       style={{
@@ -365,11 +367,11 @@ export default function Home() {
                         backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                       }}
                     >
-                      create?
+                      {t.home.create}
                     </em>
                   </h2>
                   <p className="text-sm mb-10" style={{ color: '#9A96B0', lineHeight: 1.7 }}>
-                    Choose your preferred method — describe freely or answer guided questions.
+                    {t.home.choosePrefMethod}
                   </p>
 
                   {/* Two options */}
@@ -387,12 +389,12 @@ export default function Home() {
                       >
                         <MessageSquare size={20} style={{ color: '#7C3AED' }} />
                       </div>
-                      <h3 className="text-base mb-1.5" style={{ fontWeight: 700, color: '#14121F' }}>Free Prompt</h3>
+                      <h3 className="text-base mb-1.5" style={{ fontWeight: 700, color: '#14121F' }}>{t.home.freePromptTitle}</h3>
                       <p className="text-sm leading-relaxed" style={{ color: '#9A96B0' }}>
-                        Describe your website in your own words. Fast and flexible.
+                        {t.home.freePromptDesc}
                       </p>
                       <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold" style={{ color: '#7C3AED' }}>
-                        Start typing <ArrowRight size={12} />
+                        {t.home.freePromptStart} <ArrowRight size={12} />
                       </div>
                     </motion.button>
 
@@ -409,12 +411,12 @@ export default function Home() {
                       >
                         <ClipboardList size={20} style={{ color: '#F97316' }} />
                       </div>
-                      <h3 className="text-base mb-1.5" style={{ fontWeight: 700, color: '#14121F' }}>Guided Form</h3>
+                      <h3 className="text-base mb-1.5" style={{ fontWeight: 700, color: '#14121F' }}>{t.home.guidedFormTitle}</h3>
                       <p className="text-sm leading-relaxed" style={{ color: '#9A96B0' }}>
-                        Answer a few questions and we'll craft the perfect prompt for you.
+                        {t.home.guidedFormDesc}
                       </p>
                       <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold" style={{ color: '#F97316' }}>
-                        Get guided <ArrowRight size={12} />
+                        {t.home.guidedFormStart} <ArrowRight size={12} />
                       </div>
                     </motion.button>
                   </div>
@@ -465,15 +467,15 @@ export default function Home() {
                     className="flex items-center gap-2 text-sm font-medium mb-6 hover:opacity-70 transition-opacity"
                     style={{ color: '#9A96B0' }}
                   >
-                    <ArrowLeft size={15} /> Back
+                    <ArrowLeft size={15} /> {t.common.back}
                   </button>
 
                   {!formData.category ? (
                     <div>
                       <h2 className="text-2xl mb-1" style={{ fontWeight: 800, color: '#14121F' }}>
-                        What do you want to build?
+                        {t.home.whatToBuild}
                       </h2>
-                      <p className="text-sm mb-6" style={{ color: '#9A96B0' }}>Choose the type of website</p>
+                      <p className="text-sm mb-6" style={{ color: '#9A96B0' }}>{t.home.chooseType}</p>
                       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {CATEGORY_OPTIONS.map((cat) => {
                           const Icon = cat.icon;
@@ -513,14 +515,14 @@ export default function Home() {
                         className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4"
                         style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.18)', color: '#7C3AED' }}
                       >
-                        {CATEGORY_OPTIONS.find((c) => c.value === formData.category)?.label} · Step {formStep + 1} of {totalSteps}
+                        {CATEGORY_OPTIONS.find((c) => c.value === formData.category)?.label} · {t.home.stepOf.replace('{step}', String(formStep + 1)).replace('{total}', String(totalSteps))}
                       </div>
 
                       <h2 className="text-2xl mb-1" style={{ fontWeight: 800, color: '#14121F' }}>
                         {currentStepData?.question}
                       </h2>
                       <p className="text-sm mb-6" style={{ color: '#9A96B0' }}>
-                        Be as specific as possible for better results
+                        {t.home.beSpecific}
                       </p>
 
                       <textarea
@@ -548,7 +550,7 @@ export default function Home() {
                       />
 
                       <div className="flex items-center justify-between mt-4">
-                        <span className="text-xs" style={{ color: '#9A96B0' }}>Tip: Ctrl+Enter to continue</span>
+                        <span className="text-xs" style={{ color: '#9A96B0' }}>{t.home.tipCtrlEnter}</span>
                         {formStep < totalSteps - 1 ? (
                           <motion.button
                             whileHover={{ scale: 1.03 }}
@@ -558,7 +560,7 @@ export default function Home() {
                             className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-40"
                             style={{ background: 'linear-gradient(135deg, #7C3AED, #9333EA)' }}
                           >
-                            Next <ArrowRight size={14} />
+                            {t.common.next} <ArrowRight size={14} />
                           </motion.button>
                         ) : (
                           <motion.button
@@ -569,14 +571,14 @@ export default function Home() {
                             style={{ background: 'linear-gradient(135deg, #7C3AED, #F97316)' }}
                           >
                             <Wand2 size={14} />
-                            Generate Website
+                            {t.home.generateWebsite}
                           </motion.button>
                         )}
                       </div>
 
                       {formStep > 0 && (
                         <div className="mt-6 flex flex-col gap-2">
-                          <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#9A96B0' }}>Your answers so far</p>
+                          <p className="text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: '#9A96B0' }}>{t.home.yourAnswers}</p>
                           {currentSteps.slice(0, formStep).map((step) => (
                             formData[step.key] ? (
                               <div
@@ -618,10 +620,10 @@ export default function Home() {
                       style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.18)', color: '#7C3AED' }}
                     >
                       <Sparkles size={11} />
-                      Free Prompt
+                      {t.home.freePromptTitle}
                     </div>
                     <h2 className="text-2xl md:text-3xl leading-tight" style={{ fontWeight: 800, color: '#14121F' }}>
-                      Describe your{' '}
+                      {t.home.describeYour}{' '}
                       <em
                         className="not-italic"
                         style={{
@@ -629,11 +631,11 @@ export default function Home() {
                           backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
                         }}
                       >
-                        website
+                        {t.home.website}
                       </em>
                     </h2>
                     <p className="text-sm mt-2" style={{ color: '#9A96B0' }}>
-                      Type anything — or pick an idea below to get started fast.
+                      {t.home.typeAnything}
                     </p>
                   </div>
 
